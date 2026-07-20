@@ -1,0 +1,23 @@
+# Secrets and client data — never commit
+.env
+
+# Generated state
+db/*.db
+db/chroma/
+db/*.pkl
+output/
+config/thresholds.json
+calibration_report.md
+evaluation_report.md
+
+# Data corpora (synthetic seed data is committed; incoming RFPs are not)
+data/incoming/*
+!data/incoming/.gitkeep
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+*.egg-info/
