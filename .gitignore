@@ -10,9 +10,16 @@ config/thresholds.json
 calibration_report.md
 evaluation_report.md
 
-# Data corpora (synthetic seed data is committed; incoming RFPs are not)
+# Source documents are never committed (plan section 10: synthetic and public data
+# only; CLAUDE.md: never commit client data). Synthetic seed corpora and the labelled
+# eval sets ARE committed, so they stay .md / .json / .txt and survive these rules.
 data/incoming/*
 !data/incoming/.gitkeep
+data/**/*.pdf
+data/**/*.docx
+data/**/*.doc
+data/**/*.xlsx
+data/**/*.pptx
 
 # Python
 __pycache__/
