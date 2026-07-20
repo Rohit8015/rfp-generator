@@ -1,0 +1,404 @@
+{
+  "retrieval_pairs": [
+    {
+      "query_id": "RQ-001",
+      "query": "How do you handle subject access requests under DPDP Act?",
+      "relevant_ids": ["HQ-014", "KB-003"],
+      "expected_decision": "SYNTHESIZE",
+      "difficulty": "medium",
+      "requires_lexical": false
+    },
+    {
+      "query_id": "RQ-002",
+      "query": "Describe your SOC2 Type II certification and compliance process.",
+      "relevant_ids": ["HQ-006", "KB-002"],
+      "expected_decision": "REUSE",
+      "difficulty": "easy",
+      "requires_lexical": true
+    },
+    {
+      "query_id": "RQ-003",
+      "query": "What is your experience with digital lending platforms for NBFCs?",
+      "relevant_ids": ["HQ-032", "HQ-004", "KB-005"],
+      "expected_decision": "ADAPT",
+      "difficulty": "easy",
+      "requires_lexical": false
+    },
+    {
+      "query_id": "RQ-004",
+      "query": "Implement AI-based credit scoring using alternative data for thin-file customers.",
+      "relevant_ids": ["HQ-025", "HQ-002", "KB-005"],
+      "expected_decision": "ADAPT",
+      "difficulty": "medium",
+      "requires_lexical": false
+    },
+    {
+      "query_id": "RQ-005",
+      "query": "How do you ensure HIPAA compliance in healthcare EHR implementations?",
+      "relevant_ids": ["HQ-002", "HQ-106", "KB-003"],
+      "expected_decision": "SYNTHESIZE",
+      "difficulty": "medium",
+      "requires_lexical": true
+    },
+    {
+      "query_id": "RQ-006",
+      "query": "What is your approach to cloud migration for SAP workloads?",
+      "relevant_ids": ["HQ-011", "HQ-042", "KB-004"],
+      "expected_decision": "ADAPT",
+      "difficulty": "medium",
+      "requires_lexical": false
+    },
+    {
+      "query_id": "RQ-007",
+      "query": "Describe your zero-trust security architecture implementation.",
+      "relevant_ids": ["HQ-109", "HQ-077", "KB-002"],
+      "expected_decision": "SYNTHESIZE",
+      "difficulty": "hard",
+      "requires_lexical": false
+    },
+    {
+      "query_id": "RQ-008",
+      "query": "How do you implement PSD2 compliance for payment services?",
+      "relevant_ids": ["HQ-044", "HQ-076", "KB-003"],
+      "expected_decision": "SYNTHESIZE",
+      "difficulty": "hard",
+      "requires_lexical": true
+    },
+    {
+      "query_id": "RQ-009",
+      "query": "Describe your FinOps and cloud cost optimization capabilities.",
+      "relevant_ids": ["HQ-031", "HQ-108", "KB-006"],
+      "expected_decision": "ADAPT",
+      "difficulty": "easy",
+      "requires_lexical": false
+    },
+    {
+      "query_id": "RQ-010",
+      "query": "What is your experience with AI-powered fraud detection systems?",
+      "relevant_ids": ["HQ-005", "HQ-004", "KB-005"],
+      "expected_decision": "ADAPT",
+      "difficulty": "medium",
+      "requires_lexical": false
+    },
+    {
+      "query_id": "RQ-011",
+      "query": "How do you ensure data residency compliance in India?",
+      "relevant_ids": ["HQ-001", "HQ-014", "KB-003"],
+      "expected_decision": "ADAPT",
+      "difficulty": "easy",
+      "requires_lexical": false
+    },
+    {
+      "query_id": "RQ-012",
+      "query": "Describe your blockchain smart contract development capabilities.",
+      "relevant_ids": ["HQ-089", "HQ-115", "KB-010"],
+      "expected_decision": "SYNTHESIZE",
+      "difficulty": "hard",
+      "requires_lexical": false
+    },
+    {
+      "query_id": "RQ-013",
+      "query": "What is your approach to data migration in ERP implementations?",
+      "relevant_ids": ["HQ-028", "HQ-011", "KB-004"],
+      "expected_decision": "ADAPT",
+      "difficulty": "medium",
+      "requires_lexical": false
+    },
+    {
+      "query_id": "RQ-014",
+      "query": "Describe your mobile banking app development experience.",
+      "relevant_ids": ["HQ-101", "HQ-009", "KB-007"],
+      "expected_decision": "ADAPT",
+      "difficulty": "easy",
+      "requires_lexical": false
+    },
+    {
+      "query_id": "RQ-015",
+      "query": "How do you implement AI governance and model explainability?",
+      "relevant_ids": ["HQ-040", "HQ-100", "KB-005"],
+      "expected_decision": "SYNTHESIZE",
+      "difficulty": "hard",
+      "requires_lexical": false
+    },
+    {
+      "query_id": "RQ-016",
+      "query": "What is your experience with smart city IoT deployments?",
+      "relevant_ids": ["HQ-023", "HQ-015", "KB-005"],
+      "expected_decision": "ADAPT",
+      "difficulty": "medium",
+      "requires_lexical": false
+    },
+    {
+      "query_id": "RQ-017",
+      "query": "Describe your RPA and intelligent automation capabilities.",
+      "relevant_ids": ["HQ-017", "HQ-114", "KB-007"],
+      "expected_decision": "ADAPT",
+      "difficulty": "easy",
+      "requires_lexical": false
+    },
+    {
+      "query_id": "RQ-018",
+      "query": "How do you implement secure coding standards and DevSecOps?",
+      "relevant_ids": ["HQ-070", "HQ-008", "KB-002"],
+      "expected_decision": "SYNTHESIZE",
+      "difficulty": "medium",
+      "requires_lexical": false
+    },
+    {
+      "query_id": "RQ-019",
+      "query": "What is your approach to application modernization and legacy transformation?",
+      "relevant_ids": ["HQ-019", "HQ-091", "KB-004"],
+      "expected_decision": "ADAPT",
+      "difficulty": "medium",
+      "requires_lexical": false
+    },
+    {
+      "query_id": "RQ-020",
+      "query": "Describe your customer onboarding automation for financial institutions.",
+      "relevant_ids": ["HQ-001", "HQ-004", "KB-005"],
+      "expected_decision": "ADAPT",
+      "difficulty": "easy",
+      "requires_lexical": false
+    },
+    {
+      "query_id": "RQ-021",
+      "query": "How do you handle GDPR compliance for European clients?",
+      "relevant_ids": ["HQ-047", "HQ-002", "KB-003"],
+      "expected_decision": "SYNTHESIZE",
+      "difficulty": "medium",
+      "requires_lexical": true
+    },
+    {
+      "query_id": "RQ-022",
+      "query": "Describe your multi-cloud management and governance framework.",
+      "relevant_ids": ["HQ-096", "HQ-033", "KB-006"],
+      "expected_decision": "SYNTHESIZE",
+      "difficulty": "hard",
+      "requires_lexical": false
+    },
+    {
+      "query_id": "RQ-023",
+      "query": "What is your experience with event-driven architecture and microservices?",
+      "relevant_ids": ["HQ-098", "HQ-007", "KB-010"],
+      "expected_decision": "SYNTHESIZE",
+      "difficulty": "hard",
+      "requires_lexical": false
+    },
+    {
+      "query_id": "RQ-024",
+      "query": "Describe your digital twin and IoT capabilities for manufacturing.",
+      "relevant_ids": ["HQ-050", "HQ-023", "KB-010"],
+      "expected_decision": "SYNTHESIZE",
+      "difficulty": "hard",
+      "requires_lexical": false
+    },
+    {
+      "query_id": "RQ-025",
+      "query": "How do you implement cross-border payment systems?",
+      "relevant_ids": ["HQ-117", "HQ-044", "KB-005"],
+      "expected_decision": "SYNTHESIZE",
+      "difficulty": "hard",
+      "requires_lexical": false
+    },
+    {
+      "query_id": "RQ-026",
+      "query": "Describe your low-code application development platform.",
+      "relevant_ids": ["HQ-048", "HQ-027", "KB-007"],
+      "expected_decision": "ADAPT",
+      "difficulty": "medium",
+      "requires_lexical": false
+    },
+    {
+      "query_id": "RQ-027",
+      "query": "What is your approach to IT disaster recovery and business continuity?",
+      "relevant_ids": ["HQ-024", "HQ-086", "KB-002"],
+      "expected_decision": "ADAPT",
+      "difficulty": "easy",
+      "requires_lexical": false
+    },
+    {
+      "query_id": "RQ-028",
+      "query": "Describe your talent acquisition and recruitment platform.",
+      "relevant_ids": ["HQ-056", "HQ-111", "KB-008"],
+      "expected_decision": "SYNTHESIZE",
+      "difficulty": "medium",
+      "requires_lexical": false
+    },
+    {
+      "query_id": "RQ-029",
+      "query": "How do you implement observability and monitoring for microservices?",
+      "relevant_ids": ["HQ-074", "HQ-062", "KB-010"],
+      "expected_decision": "SYNTHESIZE",
+      "difficulty": "hard",
+      "requires_lexical": false
+    },
+    {
+      "query_id": "RQ-030",
+      "query": "Describe your experience with Google Cloud Platform (GCP).",
+      "relevant_ids": ["HQ-085", "HQ-003", "KB-006"],
+      "expected_decision": "ADAPT",
+      "difficulty": "easy",
+      "requires_lexical": false
+    },
+    {
+      "query_id": "RQ-031",
+      "query": "What is your approach to ESG data management and reporting?",
+      "relevant_ids": ["HQ-113", "HQ-063", "KB-010"],
+      "expected_decision": "SYNTHESIZE",
+      "difficulty": "hard",
+      "requires_lexical": false
+    },
+    {
+      "query_id": "RQ-032",
+      "query": "Describe your digital workplace and collaboration solutions.",
+      "relevant_ids": ["HQ-071", "HQ-105", "KB-007"],
+      "expected_decision": "ADAPT",
+      "difficulty": "medium",
+      "requires_lexical": false
+    },
+    {
+      "query_id": "RQ-033",
+      "query": "How do you implement API security and governance?",
+      "relevant_ids": ["HQ-061", "HQ-007", "KB-002"],
+      "expected_decision": "SYNTHESIZE",
+      "difficulty": "medium",
+      "requires_lexical": false
+    },
+    {
+      "query_id": "RQ-034",
+      "query": "Describe your experience with Microsoft Dynamics 365.",
+      "relevant_ids": ["HQ-087", "HQ-011", "KB-006"],
+      "expected_decision": "ADAPT",
+      "difficulty": "medium",
+      "requires_lexical": false
+    },
+    {
+      "query_id": "RQ-035",
+      "query": "What is your approach to data anonymization and privacy?",
+      "relevant_ids": ["HQ-082", "HQ-014", "KB-003"],
+      "expected_decision": "ADAPT",
+      "difficulty": "medium",
+      "requires_lexical": false
+    },
+    {
+      "query_id": "RQ-036",
+      "query": "Describe your manufacturing execution system (MES) capabilities.",
+      "relevant_ids": ["HQ-118", "HQ-104", "KB-010"],
+      "expected_decision": "SYNTHESIZE",
+      "difficulty": "hard",
+      "requires_lexical": false
+    },
+    {
+      "query_id": "RQ-037",
+      "query": "How do you implement containerization and Kubernetes?",
+      "relevant_ids": ["HQ-045", "HQ-008", "KB-007"],
+      "expected_decision": "ADAPT",
+      "difficulty": "medium",
+      "requires_lexical": false
+    },
+    {
+      "query_id": "RQ-038",
+      "query": "Describe your digital health record (EHR) implementation.",
+      "relevant_ids": ["HQ-106", "HQ-002", "KB-005"],
+      "expected_decision": "ADAPT",
+      "difficulty": "medium",
+      "requires_lexical": false
+    },
+    {
+      "query_id": "RQ-039",
+      "query": "What is your approach to PAM (Privileged Access Management)?",
+      "relevant_ids": ["HQ-066", "HQ-077", "KB-002"],
+      "expected_decision": "SYNTHESIZE",
+      "difficulty": "hard",
+      "requires_lexical": false
+    },
+    {
+      "query_id": "RQ-040",
+      "query": "Describe your experience with Salesforce integration and implementation.",
+      "relevant_ids": ["HQ-107", "HQ-007", "KB-006"],
+      "expected_decision": "ADAPT",
+      "difficulty": "medium",
+      "requires_lexical": false
+    },
+    {
+      "query_id": "RQ-041",
+      "query": "How do you implement data mesh architecture?",
+      "relevant_ids": ["HQ-102", "HQ-049", "KB-005"],
+      "expected_decision": "SYNTHESIZE",
+      "difficulty": "hard",
+      "requires_lexical": false
+    },
+    {
+      "query_id": "RQ-042",
+      "query": "Describe your AI-powered customer service and chatbot solutions.",
+      "relevant_ids": ["HQ-075", "HQ-017", "KB-005"],
+      "expected_decision": "ADAPT",
+      "difficulty": "medium",
+      "requires_lexical": false
+    },
+    {
+      "query_id": "RQ-043",
+      "query": "What is your approach to supply chain digitization?",
+      "relevant_ids": ["HQ-104", "HQ-118", "KB-010"],
+      "expected_decision": "SYNTHESIZE",
+      "difficulty": "hard",
+      "requires_lexical": false
+    },
+    {
+      "query_id": "RQ-044",
+      "query": "Describe your experience with treasury management systems.",
+      "relevant_ids": ["HQ-112", "HQ-076", "KB-005"],
+      "expected_decision": "SYNTHESIZE",
+      "difficulty": "hard",
+      "requires_lexical": false
+    },
+    {
+      "query_id": "RQ-045",
+      "query": "How do you implement software composition analysis (SCA)?",
+      "relevant_ids": ["HQ-068", "HQ-070", "KB-002"],
+      "expected_decision": "SYNTHESIZE",
+      "difficulty": "medium",
+      "requires_lexical": false
+    },
+    {
+      "query_id": "RQ-046",
+      "query": "Describe your digital asset tokenization capabilities.",
+      "relevant_ids": ["HQ-115", "HQ-089", "KB-010"],
+      "expected_decision": "SYNTHESIZE",
+      "difficulty": "hard",
+      "requires_lexical": false
+    },
+    {
+      "query_id": "RQ-047",
+      "query": "What is your experience with Azure cloud services?",
+      "relevant_ids": ["HQ-069", "HQ-003", "KB-006"],
+      "expected_decision": "ADAPT",
+      "difficulty": "easy",
+      "requires_lexical": false
+    },
+    {
+      "query_id": "RQ-048",
+      "query": "Describe your digital government services and e-governance platform.",
+      "relevant_ids": ["HQ-120", "HQ-015", "KB-005"],
+      "expected_decision": "ADAPT",
+      "difficulty": "medium",
+      "requires_lexical": false
+    },
+    {
+      "query_id": "RQ-049",
+      "query": "How do you implement AIOps for IT operations?",
+      "relevant_ids": ["HQ-095", "HQ-062", "KB-010"],
+      "expected_decision": "SYNTHESIZE",
+      "difficulty": "hard",
+      "requires_lexical": false
+    },
+    {
+      "query_id": "RQ-050",
+      "query": "Describe your experience with payment gateway integrations.",
+      "relevant_ids": ["HQ-044", "HQ-076", "KB-005"],
+      "expected_decision": "ADAPT",
+      "difficulty": "easy",
+      "requires_lexical": false
+    }
+  ]
+}

@@ -1,0 +1,104 @@
+programme: large_transformation
+duration_months: 48
+description: "Large-scale enterprise transformation (₹120-180 Cr, 80 FTE peak)"
+
+phases:
+  - name: Discovery
+    weeks: 12
+    fte: 30
+    description: "Full portfolio assessment, enterprise architecture design"
+  - name: Design
+    weeks: 16
+    fte: 40
+    description: "Detailed solution design across all domains"
+  - name: Build_Phase1
+    weeks: 24
+    fte: 60
+    description: "Sprint 1-6: Foundation and core systems"
+  - name: Build_Phase2
+    weeks: 20
+    fte: 80
+    description: "Sprint 7-10: Advanced capabilities"
+  - name: Build_Phase3
+    weeks: 16
+    fte: 70
+    description: "Sprint 11-13: Integration and refinements"
+  - name: Pilot
+    weeks: 12
+    fte: 50
+    description: "Multi-site pilot, extensive UAT"
+  - name: Rollout
+    weeks: 24
+    fte: 40
+    description: "Nationwide phased rollout"
+  - name: Stabilize
+    weeks: 12
+    fte: 20
+    description: "Extended hyper-care, global transition"
+
+total_weeks: 136
+peak_fte: 80
+average_fte: 55
+
+cost_parameters:
+  blended_day_rate_eur: 1000
+  blended_day_rate_inr: 90000
+  software_subscription_eur: 5000000
+  software_subscription_inr: 450000000
+  cloud_eur: 4000000
+  cloud_inr: 360000000
+  contingency_pct: 10
+  additional_training_eur: 2500000
+  additional_training_inr: 225000000
+  program_management_eur: 3000000
+  program_management_inr: 270000000
+  change_management_eur: 2000000
+  change_management_inr: 180000000
+
+deliverables:
+  - "Enterprise architecture framework"
+  - "Solution design documents (10+ modules)"
+  - "Working software (15+ releases)"
+  - "Integration hub with 50+ APIs"
+  - "Data migration and analytics platform"
+  - "Cybersecurity and compliance framework"
+  - "Change management and adoption plan"
+  - "Training program (1000+ users)"
+  - "Post-implementation review and benefits realization"
+
+milestones:
+  - name: "M1 - Discovery Complete"
+    week: 12
+    deliverable: "Strategic roadmap"
+    payment_pct: 10
+  - name: "M2 - Design Complete"
+    week: 28
+    deliverable: "Detailed designs"
+    payment_pct: 15
+  - name: "M3 - Core Platform Ready"
+    week: 52
+    deliverable: "MVP + integration"
+    payment_pct: 15
+  - name: "M4 - Phase 1 Complete"
+    week: 76
+    deliverable: "First domain live"
+    payment_pct: 15
+  - name: "M5 - Phase 2 Complete"
+    week: 96
+    deliverable: "Second domain live"
+    payment_pct: 15
+  - name: "M6 - Full Capability"
+    week: 112
+    deliverable: "All features ready"
+    payment_pct: 15
+  - name: "M7 - Full Rollout"
+    week: 136
+    deliverable: "Nationwide go-live"
+    payment_pct: 15
+
+assumptions:
+  - "Client has global operations with India presence"
+  - "Client has mature IT organization"
+  - "Multi-year funding commitment in place"
+  - "Steering committee meets monthly"
+  - "Client has DPO and security teams in place"

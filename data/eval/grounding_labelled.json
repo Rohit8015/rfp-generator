@@ -1,0 +1,330 @@
+{
+  "grounding_pairs": [
+    {
+      "pair_id": "G-001",
+      "claim": "We've delivered 85% automation in NBFC lending operations, reducing TAT from 3 days to 15 minutes.",
+      "context": "We've built end-to-end digital lending platforms for 25+ NBFCs and banks. Our platform covers: (1) Multi-channel origination (web, mobile, API), (2) AI-powered underwriting using alternative data, (3) Digital KYC with Aadhaar eSign, (4) Automated disbursement and collections. Our platforms have processed 5M+ loans worth ₹50,000+ Crores with 95% automated processing.",
+      "is_supported": true,
+      "supporting_source": "HQ-032",
+      "notes": "Claim accurately reflects the source content"
+    },
+    {
+      "pair_id": "G-002",
+      "claim": "Our AI-powered fraud detection achieves 99.99% accuracy.",
+      "context": "Our AI/ML fraud detection framework uses: (1) Supervised learning models (XGBoost, Random Forest, Neural Networks), (2) Unsupervised learning for anomaly detection, (3) Real-time scoring with sub-100ms latency, (4) Continuous learning. Deployed for 25+ financial clients with false positive rate <2% and detection rate >95%.",
+      "is_supported": false,
+      "supporting_source": "HQ-005",
+      "notes": "Claim says 99.99% accuracy but source says 95% detection rate - subtle inflation"
+    },
+    {
+      "pair_id": "G-003",
+      "claim": "We've implemented digital twin solutions for 10+ manufacturing clients, reducing downtime by 30%.",
+      "context": "Our digital twin solutions include: (1) Physical asset modeling, (2) IoT data integration, (3) Predictive maintenance, (4) What-if scenario modeling. We've deployed digital twins for 10+ manufacturing clients, reducing downtime by 30% and improving efficiency by 25%.",
+      "is_supported": true,
+      "supporting_source": "HQ-050",
+      "notes": "Accurate claim matching source"
+    },
+    {
+      "pair_id": "G-004",
+      "claim": "Our FinOps implementation reduced client cloud costs by 50%.",
+      "context": "Our FinOps practice includes: (1) Cloud spend visibility, (2) Rightsizing recommendations, (3) Reserved instance management, (4) Waste reduction. We've delivered 25% average cloud cost savings for 40+ clients.",
+      "is_supported": false,
+      "supporting_source": "HQ-031",
+      "notes": "Claim says 50% but source says 25% - subtle exaggeration"
+    },
+    {
+      "pair_id": "G-005",
+      "claim": "We've implemented SAP S/4HANA for 10+ clients with 95% success rate.",
+      "context": "Our S/4HANA migration approach includes code remediation, data migration, testing, and hyper-care. We've completed 10+ S/4HANA migrations for clients with 95%+ success rate.",
+      "is_supported": true,
+      "supporting_source": "HQ-042",
+      "notes": "Accurate claim matching source"
+    },
+    {
+      "pair_id": "G-006",
+      "claim": "Our mobile apps have 4.9+ average app store ratings.",
+      "context": "We've delivered 120+ mobile apps with 50M+ cumulative downloads and 4.5+ average app store ratings.",
+      "is_supported": false,
+      "supporting_source": "HQ-009",
+      "notes": "Claim says 4.9+ but source says 4.5+ - subtle inflation"
+    },
+    {
+      "pair_id": "G-007",
+      "claim": "We've achieved 100% HIPAA compliance with 0 material findings for 4 years.",
+      "context": "We've maintained HIPAA compliance for 12+ healthcare clients. We undergo annual third-party audits with 0 material findings for the past 4 years.",
+      "is_supported": true,
+      "supporting_source": "HQ-002",
+      "notes": "Accurate claim matching source"
+    },
+    {
+      "pair_id": "G-008",
+      "claim": "Our automated testing reduces test execution time by 90%.",
+      "context": "We operate a 500+ test case library with 95% automation rate. Our automated testing reduces test execution time by 80% and catches 60% of defects before QA.",
+      "is_supported": false,
+      "supporting_source": "HQ-016",
+      "notes": "Claim says 90% but source says 80% - subtle exaggeration"
+    },
+    {
+      "pair_id": "G-009",
+      "claim": "We've been a Microsoft Gold Partner since 2018 with 150+ Azure certifications.",
+      "context": "We are a Microsoft Gold Partner with 100+ Azure certifications. We've managed 500+ Azure subscriptions with 100% SLA.",
+      "is_supported": false,
+      "supporting_source": "HQ-069",
+      "notes": "Claim says 150+ certifications but source says 100+ - subtle inflation"
+    },
+    {
+      "pair_id": "G-010",
+      "claim": "Our customer onboarding automation reduced TAT from 3 days to 15 minutes.",
+      "context": "AI-powered digital onboarding platform for NBFC client with 15-minute TAT, 95% automation, 80% reduction in NPA.",
+      "is_supported": true,
+      "supporting_source": "KB-005",
+      "notes": "Accurate claim matching source"
+    },
+    {
+      "pair_id": "G-011",
+      "claim": "We've deployed blockchain solutions in production for 5 financial clients.",
+      "context": "We've completed 5 blockchain POCs for financial clients and 3 production implementations.",
+      "is_supported": false,
+      "supporting_source": "HQ-022",
+      "notes": "Claim says 5 production but source says 3 production - subtle overstatement"
+    },
+    {
+      "pair_id": "G-012",
+      "claim": "Our data warehouse solutions process 1PB+ data for 50+ clients.",
+      "context": "We've built 50+ data warehouses for clients processing 1PB+ data. Our platforms serve 5000+ active users.",
+      "is_supported": true,
+      "supporting_source": "HQ-036",
+      "notes": "Accurate claim matching source"
+    },
+    {
+      "pair_id": "G-013",
+      "claim": "Our RPA implementations achieve 3x ROI in 6 months.",
+      "context": "We've automated 1000+ processes for 40+ clients. Average ROI achieved: 3-5x within 12 months.",
+      "is_supported": false,
+      "supporting_source": "HQ-017",
+      "notes": "Claim says 6 months but source says 12 months - timeline compression"
+    },
+    {
+      "pair_id": "G-014",
+      "claim": "We've implemented IAM for 50+ clients with 100% compliance.",
+      "context": "We've implemented IAM for 50+ clients with 100% compliance and 40% faster access.",
+      "is_supported": true,
+      "supporting_source": "HQ-077",
+      "notes": "Accurate claim matching source"
+    },
+    {
+      "pair_id": "G-015",
+      "claim": "Our DevOps practice operates 1000+ CI/CD pipelines.",
+      "context": "We operate 100+ pipelines for 30+ clients with 99% deployment success rate.",
+      "is_supported": false,
+      "supporting_source": "HQ-008",
+      "notes": "Claim says 1000+ but source says 100+ - order of magnitude inflation"
+    },
+    {
+      "pair_id": "G-016",
+      "claim": "We've modernized 200+ applications with 40% TCO reduction.",
+      "context": "We've modernized 200+ applications for 50+ clients with 40% TCO reduction.",
+      "is_supported": true,
+      "supporting_source": "HQ-091",
+      "notes": "Accurate claim matching source"
+    },
+    {
+      "pair_id": "G-017",
+      "claim": "Our secure coding practices reduce vulnerabilities by 80%.",
+      "context": "Our secure code reduces vulnerabilities by 70% and lowers remediation costs by 80%.",
+      "is_supported": false,
+      "supporting_source": "HQ-070",
+      "notes": "Claim says 80% but source says 70% - subtle inflation"
+    },
+    {
+      "pair_id": "G-018",
+      "claim": "We've served 20M+ citizens through government projects.",
+      "context": "Our digital government platforms have served 20M+ citizens across 50+ government departments.",
+      "is_supported": true,
+      "supporting_source": "HQ-120",
+      "notes": "Accurate claim matching source"
+    },
+    {
+      "pair_id": "G-019",
+      "claim": "Our ESG platform has been used by 25+ companies.",
+      "context": "Our platforms used by 15+ corporations with standardized reporting.",
+      "is_supported": false,
+      "supporting_source": "HQ-063",
+      "notes": "Claim says 25+ but source says 15+ - subtle inflation"
+    },
+    {
+      "pair_id": "G-020",
+      "claim": "We've implemented data mesh for 10+ enterprise clients.",
+      "context": "We've implemented data mesh for 10+ enterprise clients with 50% faster data access.",
+      "is_supported": true,
+      "supporting_source": "HQ-102",
+      "notes": "Accurate claim matching source"
+    },
+    {
+      "pair_id": "G-021",
+      "claim": "Our healthcare EHR platform has 100M+ patient records.",
+      "context": "We've implemented EHR for 50+ hospitals with 100M+ patient records.",
+      "is_supported": true,
+      "supporting_source": "HQ-106",
+      "notes": "Accurate claim matching source"
+    },
+    {
+      "pair_id": "G-022",
+      "claim": "Our DR solution guarantees 0% data loss.",
+      "context": "We've implemented DR for 40+ clients with 100% recovery success and <2% data loss.",
+      "is_supported": false,
+      "supporting_source": "HQ-086",
+      "notes": "Claim says 0% but source says <2% - absolute vs relative claim"
+    },
+    {
+      "pair_id": "G-023",
+      "claim": "We've delivered 15+ digital transformation engagements with NBFCs.",
+      "context": "We've completed 15+ digital transformation engagements with NBFCs in India.",
+      "is_supported": true,
+      "supporting_source": "HQ-004",
+      "notes": "Accurate claim matching source"
+    },
+    {
+      "pair_id": "G-024",
+      "claim": "Our AI models achieve 99% accuracy in credit scoring.",
+      "context": "Our models achieved 95% accuracy with 30% reduction in NPAs.",
+      "is_supported": false,
+      "supporting_source": "HQ-025",
+      "notes": "Claim says 99% but source says 95% - subtle inflation"
+    },
+    {
+      "pair_id": "G-025",
+      "claim": "We've deployed smart city solutions in 8 Indian cities.",
+      "context": "We've been involved in 8 smart city initiatives across India serving 5M+ citizens.",
+      "is_supported": true,
+      "supporting_source": "HQ-015",
+      "notes": "Accurate claim matching source"
+    },
+    {
+      "pair_id": "G-026",
+      "claim": "Our contact center platform reduces handling time by 50%.",
+      "context": "We've deployed solutions for 25+ clients with a 40% reduction in average handling time.",
+      "is_supported": false,
+      "supporting_source": "HQ-018",
+      "notes": "Claim says 50% but source says 40% - subtle inflation"
+    },
+    {
+      "pair_id": "G-027",
+      "claim": "We've built 100+ products with 95% success rate.",
+      "context": "We've built 100+ products with 95% success rate across multiple domains.",
+      "is_supported": true,
+      "supporting_source": "HQ-053",
+      "notes": "Accurate claim matching source"
+    },
+    {
+      "pair_id": "G-028",
+      "claim": "Our low-code platform delivers 70% faster development.",
+      "context": "We deliver 50% faster development using low-code platforms.",
+      "is_supported": false,
+      "supporting_source": "HQ-048",
+      "notes": "Claim says 70% but source says 50% - subtle inflation"
+    },
+    {
+      "pair_id": "G-029",
+      "claim": "We've implemented zero-trust for 15+ clients with 0 breaches.",
+      "context": "We've implemented zero-trust for 15+ clients with 70% security improvement and 0 breaches.",
+      "is_supported": true,
+      "supporting_source": "HQ-109",
+      "notes": "Accurate claim matching source"
+    },
+    {
+      "pair_id": "G-030",
+      "claim": "Our container strategy reduces infrastructure costs by 50%.",
+      "context": "Our container strategy reduces infrastructure costs by 40%.",
+      "is_supported": false,
+      "supporting_source": "HQ-045",
+      "notes": "Claim says 50% but source says 40% - subtle inflation"
+    },
+    {
+      "pair_id": "G-031",
+      "claim": "We've implemented event-driven architecture for 20+ clients.",
+      "context": "We've implemented event-driven architecture for 20+ clients processing 1B+ daily events.",
+      "is_supported": true,
+      "supporting_source": "HQ-110",
+      "notes": "Accurate claim matching source"
+    },
+    {
+      "pair_id": "G-032",
+      "claim": "Our workforce solutions achieve 50% better retention.",
+      "context": "We've implemented for 30+ enterprises with 30% better retention.",
+      "is_supported": false,
+      "supporting_source": "HQ-111",
+      "notes": "Claim says 50% but source says 30% - subtle inflation"
+    },
+    {
+      "pair_id": "G-033",
+      "claim": "We've tokenized assets worth $500M+.",
+      "context": "We've tokenized assets worth $500M+ for 10+ clients.",
+      "is_supported": true,
+      "supporting_source": "HQ-115",
+      "notes": "Accurate claim matching source"
+    },
+    {
+      "pair_id": "G-034",
+      "claim": "Our intelligent automation reduces costs by 40%.",
+      "context": "We've automated 1000+ processes with 30% cost reduction.",
+      "is_supported": false,
+      "supporting_source": "HQ-114",
+      "notes": "Claim says 40% but source says 30% - subtle inflation"
+    },
+    {
+      "pair_id": "G-035",
+      "claim": "We've implemented MES for 10+ manufacturing clients.",
+      "context": "We've implemented MES for 10+ manufacturing clients with 20% productivity increase.",
+      "is_supported": true,
+      "supporting_source": "HQ-118",
+      "notes": "Accurate claim matching source"
+    },
+    {
+      "pair_id": "G-036",
+      "claim": "Our cross-border payments solution processes $20B+ annually.",
+      "context": "We've processed $10B+ in cross-border payments for 15+ clients.",
+      "is_supported": false,
+      "supporting_source": "HQ-117",
+      "notes": "Claim says $20B+ but source says $10B+ - doubling the figure"
+    },
+    {
+      "pair_id": "G-037",
+      "claim": "Our API ecosystem platform has 1000+ API consumers.",
+      "context": "We've built platforms for 15+ ecosystems with 1000+ API consumers.",
+      "is_supported": true,
+      "supporting_source": "HQ-119",
+      "notes": "Accurate claim matching source"
+    },
+    {
+      "pair_id": "G-038",
+      "claim": "Our data migration success rate is 99.999%.",
+      "context": "Our average migration success rate is 99.99% with <1% data remediation.",
+      "is_supported": false,
+      "supporting_source": "HQ-028",
+      "notes": "Claim says 99.999% but source says 99.99% - extra 9s make it misleading"
+    },
+    {
+      "pair_id": "G-039",
+      "claim": "We've implemented GRC for 25+ clients with 40% lower costs.",
+      "context": "We've implemented GRC for 25+ clients with 40% lower compliance costs.",
+      "is_supported": true,
+      "supporting_source": "HQ-097",
+      "notes": "Accurate claim matching source"
+    },
+    {
+      "pair_id": "G-040",
+      "claim": "Our AI chatbot reduces customer handling time by 60%.",
+      "context": "We've deployed AI chatbots for 30+ clients with 50% reduction in handling time.",
+      "is_supported": false,
+      "supporting_source": "HQ-075",
+      "notes": "Claim says 60% but source says 50% - subtle inflation"
+    }
+  ],
+  "summary": {
+    "total_pairs": 40,
+    "supported_count": 20,
+    "unsupported_count": 20,
+    "verification_notes": "Unsupported items are subtly wrong (right topic, wrong numbers) rather than obviously fabricated"
+  }
+}

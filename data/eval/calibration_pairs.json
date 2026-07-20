@@ -1,0 +1,215 @@
+{
+  "calibration_pairs": [
+    {
+      "pair_id": "C-001",
+      "question": "Describe your data residency controls for financial services.",
+      "historical_id": "HQ-001",
+      "relation": "NEAR_IDENTICAL",
+      "similarity_score": 0.97
+    },
+    {
+      "pair_id": "C-002",
+      "question": "How do you ensure data residency compliance?",
+      "historical_id": "HQ-001",
+      "relation": "NEAR_IDENTICAL",
+      "similarity_score": 0.94
+    },
+    {
+      "pair_id": "C-003",
+      "question": "Describe your data localization strategy.",
+      "historical_id": "HQ-001",
+      "relation": "NEAR_IDENTICAL",
+      "similarity_score": 0.93
+    },
+    {
+      "pair_id": "C-004",
+      "question": "How do you handle HIPAA compliance?",
+      "historical_id": "HQ-002",
+      "relation": "NEAR_IDENTICAL",
+      "similarity_score": 0.96
+    },
+    {
+      "pair_id": "C-005",
+      "question": "Explain your HIPAA compliance framework.",
+      "historical_id": "HQ-002",
+      "relation": "NEAR_IDENTICAL",
+      "similarity_score": 0.95
+    },
+    {
+      "pair_id": "C-006",
+      "question": "What is your cloud migration approach?",
+      "historical_id": "HQ-003",
+      "relation": "NEAR_IDENTICAL",
+      "similarity_score": 0.96
+    },
+    {
+      "pair_id": "C-007",
+      "question": "Describe your cloud migration methodology.",
+      "historical_id": "HQ-003",
+      "relation": "NEAR_IDENTICAL",
+      "similarity_score": 0.94
+    },
+    {
+      "pair_id": "C-008",
+      "question": "What is your SOC2 certification process?",
+      "historical_id": "HQ-006",
+      "relation": "NEAR_IDENTICAL",
+      "similarity_score": 0.95
+    },
+    {
+      "pair_id": "C-009",
+      "question": "How do you handle data privacy under DPDP?",
+      "historical_id": "HQ-014",
+      "relation": "NEAR_IDENTICAL",
+      "similarity_score": 0.96
+    },
+    {
+      "pair_id": "C-010",
+      "question": "What is your AI-based fraud detection capability?",
+      "historical_id": "HQ-005",
+      "relation": "NEAR_IDENTICAL",
+      "similarity_score": 0.94
+    },
+    {
+      "pair_id": "C-011",
+      "question": "Describe your digital lending experience.",
+      "historical_id": "HQ-032",
+      "relation": "NEAR_IDENTICAL",
+      "similarity_score": 0.93
+    },
+    {
+      "pair_id": "C-012",
+      "question": "What is your FinOps approach?",
+      "historical_id": "HQ-031",
+      "relation": "NEAR_IDENTICAL",
+      "similarity_score": 0.95
+    },
+    {
+      "pair_id": "C-013",
+      "question": "How do you ensure data protection?",
+      "historical_id": "HQ-001",
+      "relation": "ADAPT",
+      "similarity_score": 0.72
+    },
+    {
+      "pair_id": "C-014",
+      "question": "Describe your security compliance certifications.",
+      "historical_id": "HQ-006",
+      "relation": "ADAPT",
+      "similarity_score": 0.68
+    },
+    {
+      "pair_id": "C-015",
+      "question": "What is your cloud cost optimization strategy?",
+      "historical_id": "HQ-108",
+      "relation": "ADAPT",
+      "similarity_score": 0.71
+    },
+    {
+      "pair_id": "C-016",
+      "question": "How do you implement AI in underwriting?",
+      "historical_id": "HQ-025",
+      "relation": "ADAPT",
+      "similarity_score": 0.69
+    },
+    {
+      "pair_id": "C-017",
+      "question": "Describe your mobile app security practices.",
+      "historical_id": "HQ-055",
+      "relation": "ADAPT",
+      "similarity_score": 0.73
+    },
+    {
+      "pair_id": "C-018",
+      "question": "What is your ERP migration experience?",
+      "historical_id": "HQ-011",
+      "relation": "ADAPT",
+      "similarity_score": 0.70
+    },
+    {
+      "pair_id": "C-019",
+      "question": "How do you handle legacy modernization?",
+      "historical_id": "HQ-019",
+      "relation": "ADAPT",
+      "similarity_score": 0.72
+    },
+    {
+      "pair_id": "C-020",
+      "question": "Describe your healthcare EHR implementation.",
+      "historical_id": "HQ-106",
+      "relation": "ADAPT",
+      "similarity_score": 0.68
+    },
+    {
+      "pair_id": "C-021",
+      "question": "What is your disaster recovery strategy?",
+      "historical_id": "HQ-024",
+      "relation": "ADAPT",
+      "similarity_score": 0.74
+    },
+    {
+      "pair_id": "C-022",
+      "question": "How do you implement zero-trust security?",
+      "historical_id": "HQ-109",
+      "relation": "ADAPT",
+      "similarity_score": 0.66
+    },
+    {
+      "pair_id": "C-023",
+      "question": "Describe your smart city experience.",
+      "historical_id": "HQ-015",
+      "relation": "ADAPT",
+      "similarity_score": 0.70
+    },
+    {
+      "pair_id": "C-024",
+      "question": "What is your RPA automation approach?",
+      "historical_id": "HQ-017",
+      "relation": "ADAPT",
+      "similarity_score": 0.72
+    },
+    {
+      "pair_id": "C-025",
+      "question": "How do you ensure GDPR compliance?",
+      "historical_id": "HQ-047",
+      "relation": "SYNTHESIZE",
+      "similarity_score": 0.45
+    },
+    {
+      "pair_id": "C-026",
+      "question": "Describe your blockchain trade finance solution.",
+      "historical_id": "HQ-003",
+      "relation": "SYNTHESIZE",
+      "similarity_score": 0.38
+    },
+    {
+      "pair_id": "C-027",
+      "question": "What is your edge AI capability?",
+      "historical_id": "HQ-023",
+      "relation": "SYNTHESIZE",
+      "similarity_score": 0.42
+    },
+    {
+      "pair_id": "C-028",
+      "question": "How do you implement digital twin for manufacturing?",
+      "historical_id": "HQ-050",
+      "relation": "SYNTHESIZE",
+      "similarity_score": 0.40
+    },
+    {
+      "pair_id": "C-029",
+      "question": "Describe your ESG reporting platform.",
+      "historical_id": "HQ-063",
+      "relation": "SYNTHESIZE",
+      "similarity_score": 0.44
+    },
+    {
+      "pair_id": "C-030",
+      "question": "What is your approach to cross-border payments?",
+      "historical_id": "HQ-117",
+      "relation": "SYNTHESIZE",
+      "similarity_score": 0.41
+    }
+  ],
+  "note": "Full 200 pairs available. The distribution is designed to calibrate similarity thresholds at: REUSE (>0.85), ADAPT (0.65-0.85), SYNTHESIZE (<0.65)"
+}

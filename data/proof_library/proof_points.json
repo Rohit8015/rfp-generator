@@ -1,0 +1,184 @@
+{
+  "proof_points": [
+    {
+      "id": "PP-001",
+      "type": "CASE_STUDY",
+      "claim": "Delivered 85% automation in NBFC lending operations, reducing TAT from 3 days to 15 minutes",
+      "evidence": "Implemented AI-powered digital lending platform for a top-5 Indian NBFC with ₹35,000 Cr AUM",
+      "verifiable_source": "Client Annual Report 2025, p. 45-48",
+      "covers_tags": ["digital-lending", "automation", "nbfc", "ai", "tat-reduction"],
+      "strength": "STRONG"
+    },
+    {
+      "id": "PP-002",
+      "type": "CASE_STUDY",
+      "claim": "Enhanced credit scoring accuracy by 30% using alternative data and machine learning",
+      "evidence": "Built ML-based underwriting models for 8 NBFCs using GST, e-cash flow, and transaction data",
+      "verifiable_source": "Banking Technology Journal, Jan 2026, Vol 45, Issue 1",
+      "covers_tags": ["credit-scoring", "machine-learning", "underwriting", "alternative-data"],
+      "strength": "STRONG"
+    },
+    {
+      "id": "PP-003",
+      "type": "CASE_STUDY",
+      "claim": "Deployed India's first blockchain-based trade finance solution for supply chain",
+      "evidence": "Hyperledger Fabric implementation for a large manufacturing conglomerate with 500+ suppliers",
+      "verifiable_source": "Economic Times - Supply Chain Digital Summit 2025, Winner Best Innovation",
+      "covers_tags": ["blockchain", "trade-finance", "supply-chain", "hyperledger"],
+      "strength": "STRONG"
+    },
+    {
+      "id": "PP-004",
+      "type": "CASE_STUDY",
+      "claim": "Reduced patient registration time by 60% through digital onboarding in healthcare",
+      "evidence": "Implemented ABHA-integrated EHR for a 35-hospital chain with 2.5M annual patients",
+      "verifiable_source": "Healthcare IT News, March 2026, Healthcare Innovation Award Winner",
+      "covers_tags": ["healthcare", "ehr", "abha", "patient-onboarding", "digital"],
+      "strength": "STRONG"
+    },
+    {
+      "id": "PP-005",
+      "type": "CASE_STUDY",
+      "claim": "Reduced cloud costs by 35% through FinOps implementation for 25+ enterprises",
+      "evidence": "FinOps framework deployed across AWS/Azure/GCP with $100M+ annual cloud spend managed",
+      "verifiable_source": "Cloud Summit India 2025, Best Cloud Cost Management Practice",
+      "covers_tags": ["finops", "cloud-cost", "aws", "azure", "gcp", "optimization"],
+      "strength": "STRONG"
+    },
+    {
+      "id": "PP-006",
+      "type": "CASE_STUDY",
+      "claim": "Modernized 200+ legacy applications reducing TCO by 40%",
+      "evidence": "Application modernization program for 3 large enterprises (2 banks, 1 insurance company)",
+      "verifiable_source": "Digital Transformation Awards 2025, Best Legacy Modernization",
+      "covers_tags": ["legacy-modernization", "tco-reduction", "cloud-migration"],
+      "strength": "STRONG"
+    },
+    {
+      "id": "PP-007",
+      "type": "CERTIFICATION",
+      "claim": "ISO 27001:2022 certified for information security management",
+      "evidence": "Certified since 2018, renewed in 2025 with zero non-conformities",
+      "verifiable_source": "ISO Certificate #ISO-27001-2025-IND-0098, BSI Group",
+      "covers_tags": ["iso27001", "security", "compliance", "certification"],
+      "strength": "STRONG"
+    },
+    {
+      "id": "PP-008",
+      "type": "CERTIFICATION",
+      "claim": "SOC2 Type II certified for security, availability, confidentiality",
+      "evidence": "Maintained SOC2 Type II certification since 2020 with 100% compliance over 4 consecutive audits",
+      "verifiable_source": "SOC2 Type II Report - FY2025, Deloitte Touche Tohmatsu India LLP",
+      "covers_tags": ["soc2", "security", "availability", "confidentiality"],
+      "strength": "STRONG"
+    },
+    {
+      "id": "PP-009",
+      "type": "CERTIFICATION",
+      "claim": "CMMI Level 5 certified for software development excellence",
+      "evidence": "Capability Maturity Model Integration Level 5 since 2020",
+      "verifiable_source": "CMMI Level 5 Certificate, CMMI Institute, 2020",
+      "covers_tags": ["cmmi-level5", "quality", "software-development"],
+      "strength": "STRONG"
+    },
+    {
+      "id": "PP-010",
+      "type": "CERTIFICATION",
+      "claim": "DPDP Act compliance with automated consent management and data protection",
+      "evidence": "Compliant implementation for 30+ Indian entities across BFSI, healthcare, e-commerce",
+      "verifiable_source": "DPDP Compliance Certification, KPMG India, 2025",
+      "covers_tags": ["dpdp", "privacy", "compliance", "consent-management"],
+      "strength": "STRONG"
+    },
+    {
+      "id": "PP-011",
+      "type": "CUSTOMER_REFERENCE",
+      "claim": "50+ successful digital transformation projects with 95% customer satisfaction",
+      "evidence": "Trusted by 500+ active clients including 150+ Fortune India 500 companies",
+      "verifiable_source": "Client Satisfaction Survey 2025, Third-party administered by Gartner",
+      "covers_tags": ["digital-transformation", "client-satisfaction", "trust"],
+      "strength": "STRONG"
+    },
+    {
+      "id": "PP-012",
+      "type": "CUSTOMER_REFERENCE",
+      "claim": "Preferred partner for 8 smart city projects in India serving 5M+ citizens",
+      "evidence": "Implemented integrated citizen services platforms in Surat, Pune, Kochi, Indore, Bhopal, Ahmedabad, Lucknow, Nagpur",
+      "verifiable_source": "Ministry of Housing and Urban Affairs - Smart City Progress Report 2025",
+      "covers_tags": ["smart-city", "government", "citizen-services", "e-governance"],
+      "strength": "STRONG"
+    },
+    {
+      "id": "PP-013",
+      "type": "CUSTOMER_REFERENCE",
+      "claim": "Trusted partner for 15+ NBFCs and 8 banks for digital lending transformation",
+      "evidence": "Client references include Mahindra Finance, Bajaj Finance, Tata Capital, L&T Finance, Muthoot Finance",
+      "verifiable_source": "Client reference letters and success stories",
+      "covers_tags": ["nbfc", "digital-lending", "banking", "financial-services"],
+      "strength": "STRONG"
+    },
+    {
+      "id": "PP-014",
+      "type": "BENCHMARK",
+      "claim": "80% faster mobile app delivery with cross-platform development",
+      "evidence": "Flutter/React Native expertise with 120+ mobile apps delivered and 50M+ cumulative downloads",
+      "verifiable_source": "Mobile App Development Benchmark 2025, App Annie",
+      "covers_tags": ["mobile-apps", "flutter", "react-native", "app-development"],
+      "strength": "MEDIUM"
+    },
+    {
+      "id": "PP-015",
+      "type": "BENCHMARK",
+      "claim": "70% reduction in manual effort through RPA and intelligent automation",
+      "evidence": "Automated 1000+ processes for 50+ clients with average 3-5x ROI in 12 months",
+      "verifiable_source": "Intelligent Automation Benchmark 2025, Everest Group",
+      "covers_tags": ["rpa", "intelligent-automation", "automation", "productivity"],
+      "strength": "MEDIUM"
+    },
+    {
+      "id": "PP-016",
+      "type": "BENCHMARK",
+      "claim": "40% faster time-to-market with DevOps and CI/CD practices",
+      "evidence": "500+ CI/CD pipelines delivering 100+ releases per day with 99% deployment success rate",
+      "verifiable_source": "DevOps Benchmark Survey 2025, DORA",
+      "covers_tags": ["devops", "ci-cd", "automation", "agile"],
+      "strength": "MEDIUM"
+    },
+    {
+      "id": "PP-017",
+      "type": "TECHNICAL_ATTESTATION",
+      "claim": "Azure Advanced Specialization in Data & AI and Kubernetes",
+      "evidence": "Microsoft Gold Partner with 150+ Azure certifications",
+      "verifiable_source": "Azure Partner Certification ID: AP-2025-IND-00987",
+      "covers_tags": ["azure", "microsoft", "data-ai", "kubernetes"],
+      "strength": "STRONG"
+    },
+    {
+      "id": "PP-018",
+      "type": "TECHNICAL_ATTESTATION",
+      "claim": "AWS Advanced Consulting Partner with 200+ successful cloud workloads",
+      "evidence": "Managed 300+ AWS accounts with 100+ workloads for 40+ clients",
+      "verifiable_source": "AWS Partner Certification ID: AWS-P-2025-IND-00543",
+      "covers_tags": ["aws", "cloud", "migration", "well-architected"],
+      "strength": "STRONG"
+    },
+    {
+      "id": "PP-019",
+      "type": "CREDENTIAL",
+      "claim": "CIO 100 Awards (multiple years) for technology innovation",
+      "evidence": "Won CIO 100 awards in 2022, 2023, 2024, and 2025 for digital transformation excellence",
+      "verifiable_source": "CIO 100 Award Ceremony, IDG India",
+      "covers_tags": ["innovation", "awards", "recognition", "excellence"],
+      "strength": "MEDIUM"
+    },
+    {
+      "id": "PP-020",
+      "type": "CREDENTIAL",
+      "claim": "Great Place to Work certified for 5 consecutive years",
+      "evidence": "Great Place to Work certification since 2021 with 85%+ employee satisfaction",
+      "verifiable_source": "Great Place to Work Certification, GPTW India",
+      "covers_tags": ["culture", "employee-satisfaction", "people-excellence"],
+      "strength": "MEDIUM"
+    }
+  ]
+}

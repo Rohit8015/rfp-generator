@@ -1,0 +1,51 @@
+programme: small_transformation
+duration_months: 6
+description: "Small-scale digital transformation (₹8-12 Cr, 20 FTE peak)"
+
+phases:
+  - name: Discovery
+    weeks: 4
+    fte: 12
+    description: "Current state assessment, requirements, solution design"
+  - name: Design
+    weeks: 4
+    fte: 12
+    description: "Detailed design, architecture, UI/UX"
+  - name: Build
+    weeks: 12
+    fte: 20
+    description: "Development, testing, integration"
+  - name: Pilot_Stabilize
+    weeks: 6
+    fte: 10
+    description: "Pilot deployment, UAT, stabilization"
+
+total_weeks: 26
+peak_fte: 20
+average_fte: 15
+
+cost_parameters:
+  blended_day_rate_eur: 850
+  blended_day_rate_inr: 75000
+  software_subscription_eur: 1200000
+  software_subscription_inr: 108000000
+  cloud_eur: 900000
+  cloud_inr: 81000000
+  contingency_pct: 10
+  additional_training_eur: 500000
+  additional_training_inr: 45000000
+
+deliverables:
+  - "Solution architecture document"
+  - "Functional specifications"
+  - "Developed application"
+  - "Test cases and results"
+  - "User training materials"
+  - "Deployment plan"
+  - "User manuals"
+
+assumptions:
+  - "Client provides all infrastructure"
+  - "Client provides timely feedback"
+  - "Scope is well-defined and stable"
+  - "Team size may vary based on client needs"

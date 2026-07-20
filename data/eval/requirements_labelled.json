@@ -1,0 +1,335 @@
+{
+  "rfp_id": "RFP-A",
+  "requirements": [
+    {
+      "requirement_id": "R-001",
+      "source_section": "2.1",
+      "text": "The vendor SHALL implement a unified customer onboarding platform supporting KYC, Aadhaar eSign, and PAN verification.",
+      "req_type": "SHALL_REQUIREMENT",
+      "priority": "MANDATORY",
+      "deliverable_form": "PLATFORM",
+      "notes": "Must include Aadhaar integration and eSign capabilities",
+      "reuse_bucket": "NEAR_IDENTICAL"
+    },
+    {
+      "requirement_id": "R-002",
+      "source_section": "2.1",
+      "text": "The vendor SHALL provide a mobile-first loan origination system (LOS) with offline capability.",
+      "req_type": "SHALL_REQUIREMENT",
+      "priority": "MANDATORY",
+      "deliverable_form": "SYSTEM",
+      "notes": "Mobile-first, must support offline mode for rural areas",
+      "reuse_bucket": "NEAR_IDENTICAL"
+    },
+    {
+      "requirement_id": "R-003",
+      "source_section": "2.1",
+      "text": "The vendor SHALL integrate with existing CBS (Core Banking System) and data warehouse.",
+      "req_type": "SHALL_REQUIREMENT",
+      "priority": "MANDATORY",
+      "deliverable_form": "INTEGRATION",
+      "notes": "Need API-based integration with legacy CBS",
+      "reuse_bucket": "ADAPT"
+    },
+    {
+      "requirement_id": "R-004",
+      "source_section": "2.1",
+      "text": "The vendor SHALL implement real-time fraud detection using AI/ML models.",
+      "req_type": "SHALL_REQUIREMENT",
+      "priority": "MANDATORY",
+      "deliverable_form": "AI_MODEL",
+      "notes": "AI/ML-based with sub-100ms latency requirement",
+      "reuse_bucket": "ADAPT"
+    },
+    {
+      "requirement_id": "R-005",
+      "source_section": "2.1",
+      "text": "The vendor SHALL ensure 99.95% system availability for customer-facing applications.",
+      "req_type": "SHALL_REQUIREMENT",
+      "priority": "MANDATORY",
+      "deliverable_form": "SLA",
+      "notes": "High availability requirement",
+      "reuse_bucket": "ADAPT"
+    },
+    {
+      "requirement_id": "R-006",
+      "source_section": "2.1",
+      "text": "The vendor SHALL comply with RBI guidelines on digital lending (2022) and Data Protection Bill.",
+      "req_type": "SHALL_REQUIREMENT",
+      "priority": "MANDATORY",
+      "deliverable_form": "COMPLIANCE",
+      "notes": "Regulatory compliance mandatory",
+      "reuse_bucket": "NEAR_IDENTICAL"
+    },
+    {
+      "requirement_id": "R-007",
+      "source_section": "2.1",
+      "text": "The vendor SHALL provide a comprehensive data migration strategy from legacy systems.",
+      "req_type": "SHALL_REQUIREMENT",
+      "priority": "MANDATORY",
+      "deliverable_form": "PLAN",
+      "notes": "Data migration from multiple legacy systems",
+      "reuse_bucket": "ADAPT"
+    },
+    {
+      "requirement_id": "R-008",
+      "source_section": "2.1",
+      "text": "The vendor SHALL conduct security audits and penetration testing quarterly.",
+      "req_type": "SHALL_REQUIREMENT",
+      "priority": "MANDATORY",
+      "deliverable_form": "SERVICE",
+      "notes": "Ongoing security assurance",
+      "reuse_bucket": "NEAR_IDENTICAL"
+    },
+    {
+      "requirement_id": "R-009",
+      "source_section": "2.1",
+      "text": "The vendor SHALL maintain a dedicated 24x7 support team for critical issues.",
+      "req_type": "SHALL_REQUIREMENT",
+      "priority": "MANDATORY",
+      "deliverable_form": "SERVICE",
+      "notes": "24x7 support required",
+      "reuse_bucket": "ADAPT"
+    },
+    {
+      "requirement_id": "R-010",
+      "source_section": "2.1",
+      "text": "The vendor SHALL provide source code escrow for all custom developments.",
+      "req_type": "SHALL_REQUIREMENT",
+      "priority": "MANDATORY",
+      "deliverable_form": "DOCUMENT",
+      "notes": "Source code escrow arrangement",
+      "reuse_bucket": "ADAPT"
+    },
+    {
+      "requirement_id": "R-011",
+      "source_section": "2.1",
+      "text": "The vendor SHALL implement role-based access control (RBAC) with audit trails.",
+      "req_type": "SHALL_REQUIREMENT",
+      "priority": "MANDATORY",
+      "deliverable_form": "SECURITY",
+      "notes": "RBAC and audit logging required",
+      "reuse_bucket": "NEAR_IDENTICAL"
+    },
+    {
+      "requirement_id": "R-012",
+      "source_section": "2.1",
+      "text": "The vendor SHALL deliver comprehensive documentation (Technical, User, Admin).",
+      "req_type": "SHALL_REQUIREMENT",
+      "priority": "MANDATORY",
+      "deliverable_form": "DOCUMENT",
+      "notes": "Complete documentation package",
+      "reuse_bucket": "ADAPT"
+    },
+    {
+      "requirement_id": "R-013",
+      "source_section": "2.2",
+      "text": "MOST IMPORTANT: Should provide AI-based predictive lead scoring.",
+      "req_type": "SHOULD_REQUIREMENT",
+      "priority": "WEIGHTED",
+      "deliverable_form": "AI_MODEL",
+      "notes": "Weight: 20 - Most important weighted requirement",
+      "reuse_bucket": "SYNTHESIZE"
+    },
+    {
+      "requirement_id": "R-014",
+      "source_section": "2.2",
+      "text": "Should offer pre-built integrations with fintech ecosystems (UPI, BBPS).",
+      "req_type": "SHOULD_REQUIREMENT",
+      "priority": "WEIGHTED",
+      "deliverable_form": "INTEGRATION",
+      "notes": "Weight: 15 - Fintech ecosystem integration",
+      "reuse_bucket": "ADAPT"
+    },
+    {
+      "requirement_id": "R-015",
+      "source_section": "2.2",
+      "text": "Should include a customer analytics dashboard with 50+ KPIs.",
+      "req_type": "SHOULD_REQUIREMENT",
+      "priority": "WEIGHTED",
+      "deliverable_form": "DASHBOARD",
+      "notes": "Weight: 15 - Analytics capabilities",
+      "reuse_bucket": "ADAPT"
+    },
+    {
+      "requirement_id": "R-016",
+      "source_section": "2.2",
+      "text": "Should provide automated regulatory reporting (RBI returns).",
+      "req_type": "SHOULD_REQUIREMENT",
+      "priority": "WEIGHTED",
+      "deliverable_form": "REPORT",
+      "notes": "Weight: 12 - Regulatory compliance",
+      "reuse_bucket": "ADAPT"
+    },
+    {
+      "requirement_id": "R-017",
+      "source_section": "2.2",
+      "text": "Should offer chatbot/voicebot integration for customer service.",
+      "req_type": "SHOULD_REQUIREMENT",
+      "priority": "WEIGHTED",
+      "deliverable_form": "AI_CHATBOT",
+      "notes": "Weight: 10 - AI-powered customer service",
+      "reuse_bucket": "ADAPT"
+    },
+    {
+      "requirement_id": "R-018",
+      "source_section": "2.2",
+      "text": "Should include social media listening and sentiment analysis.",
+      "req_type": "SHOULD_REQUIREMENT",
+      "priority": "WEIGHTED",
+      "deliverable_form": "ANALYTICS",
+      "notes": "Weight: 8 - Social media analytics",
+      "reuse_bucket": "SYNTHESIZE"
+    },
+    {
+      "requirement_id": "R-019",
+      "source_section": "2.2",
+      "text": "Should support multi-lingual interface (Hindi, Tamil, Telugu, Kannada).",
+      "req_type": "SHOULD_REQUIREMENT",
+      "priority": "WEIGHTED",
+      "deliverable_form": "UX_UI",
+      "notes": "Weight: 8 - Localization for Indian languages",
+      "reuse_bucket": "ADAPT"
+    },
+    {
+      "requirement_id": "R-020",
+      "source_section": "2.2",
+      "text": "Should provide mobile app with biometric authentication.",
+      "req_type": "SHOULD_REQUIREMENT",
+      "priority": "WEIGHTED",
+      "deliverable_form": "MOBILE",
+      "notes": "Weight: 6 - Mobile app security",
+      "reuse_bucket": "NEAR_IDENTICAL"
+    },
+    {
+      "requirement_id": "R-021",
+      "source_section": "2.2",
+      "text": "Should offer document management with AI-based classification.",
+      "req_type": "SHOULD_REQUIREMENT",
+      "priority": "WEIGHTED",
+      "deliverable_form": "AI_SYSTEM",
+      "notes": "Weight: 6 - AI-powered document management",
+      "reuse_bucket": "ADAPT"
+    },
+    {
+      "requirement_id": "R-022",
+      "source_section": "2.3",
+      "text": "May include blockchain-based document verification.",
+      "req_type": "MAY_REQUIREMENT",
+      "priority": "NICE_TO_HAVE",
+      "deliverable_form": "BLOCKCHAIN",
+      "notes": "Nice-to-have blockchain capability",
+      "reuse_bucket": "SYNTHESIZE"
+    },
+    {
+      "requirement_id": "R-023",
+      "source_section": "2.3",
+      "text": "May provide gamification features for customer engagement.",
+      "req_type": "MAY_REQUIREMENT",
+      "priority": "NICE_TO_HAVE",
+      "deliverable_form": "FEATURE",
+      "notes": "Nice-to-have gamification",
+      "reuse_bucket": "SYNTHESIZE"
+    },
+    {
+      "requirement_id": "R-024",
+      "source_section": "2.3",
+      "text": "May offer integration with CIBIL/Experian APIs.",
+      "req_type": "MAY_REQUIREMENT",
+      "priority": "NICE_TO_HAVE",
+      "deliverable_form": "INTEGRATION",
+      "notes": "Nice-to-have credit bureau integration",
+      "reuse_bucket": "ADAPT"
+    },
+    {
+      "requirement_id": "R-025",
+      "source_section": "2.3",
+      "text": "May include AR/VR for product demonstrations.",
+      "req_type": "MAY_REQUIREMENT",
+      "priority": "NICE_TO_HAVE",
+      "deliverable_form": "AR_VR",
+      "notes": "Nice-to-have immersive technology",
+      "reuse_bucket": "SYNTHESIZE"
+    },
+    {
+      "requirement_id": "R-026",
+      "source_section": "4",
+      "text": "Technical proposal must include solution architecture diagram.",
+      "req_type": "SHALL_REQUIREMENT",
+      "priority": "MANDATORY",
+      "deliverable_form": "DOCUMENT",
+      "notes": "Submission format requirement",
+      "reuse_bucket": "ADAPT"
+    },
+    {
+      "requirement_id": "R-027",
+      "source_section": "4",
+      "text": "Financial proposal must be in prescribed Excel template (Annexure B).",
+      "req_type": "SHALL_REQUIREMENT",
+      "priority": "MANDATORY",
+      "deliverable_form": "DOCUMENT",
+      "notes": "Financial submission format",
+      "reuse_bucket": "ADAPT"
+    },
+    {
+      "requirement_id": "R-028",
+      "source_section": "4",
+      "text": "Submit at least 3 client references from similar engagements.",
+      "req_type": "SHALL_REQUIREMENT",
+      "priority": "MANDATORY",
+      "deliverable_form": "REFERENCE",
+      "notes": "Reference requirement",
+      "reuse_bucket": "ADAPT"
+    },
+    {
+      "requirement_id": "R-029",
+      "source_section": "4",
+      "text": "Provide a detailed implementation timeline with milestones.",
+      "req_type": "SHALL_REQUIREMENT",
+      "priority": "MANDATORY",
+      "deliverable_form": "PLAN",
+      "notes": "Project timeline required",
+      "reuse_bucket": "ADAPT"
+    },
+    {
+      "requirement_id": "R-030",
+      "source_section": "4",
+      "text": "Include a governance framework with SLAs and penalties.",
+      "req_type": "SHALL_REQUIREMENT",
+      "priority": "MANDATORY",
+      "deliverable_form": "GOVERNANCE",
+      "notes": "Governance and SLA framework",
+      "reuse_bucket": "ADAPT"
+    },
+    {
+      "requirement_id": "R-031",
+      "source_section": "4",
+      "text": "Submission via digital platform only (URL: https://procurement.afl.com).",
+      "req_type": "SHALL_REQUIREMENT",
+      "priority": "MANDATORY",
+      "deliverable_form": "SUBMISSION",
+      "notes": "Digital submission only",
+      "reuse_bucket": "ADAPT"
+    },
+    {
+      "requirement_id": "R-032",
+      "source_section": "4",
+      "text": "Required formats: PDF for technical, XLSX for financial.",
+      "req_type": "SHALL_REQUIREMENT",
+      "priority": "MANDATORY",
+      "deliverable_form": "SUBMISSION",
+      "notes": "File format requirement",
+      "reuse_bucket": "ADAPT"
+    },
+    {
+      "requirement_id": "R-033",
+      "source_section": "4",
+      "text": "Deadline: April 30, 2026, 5:00 PM IST.",
+      "req_type": "SHALL_REQUIREMENT",
+      "priority": "MANDATORY",
+      "deliverable_form": "DEADLINE",
+      "notes": "Strict submission deadline",
+      "reuse_bucket": "ADAPT"
+    }
+  ]
+}

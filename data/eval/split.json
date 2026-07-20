@@ -1,0 +1,25 @@
+{
+  "split_name": "RFP_Copilot_v2_Dev_Test_Split",
+  "created_date": "2026-07-21",
+  "split_strategy": "BY_DOCUMENT",
+  "dev_ratio": 0.6,
+  "test_ratio": 0.4,
+  "dev_documents": [
+    "RFP-A_questionnaire_nbfc",
+    "RFP-B_narrative_healthcare",
+    "RFP-C_hybrid_government"
+  ],
+  "test_documents": [
+    "RFP-D_test_heldout",
+    "RFP-E_test_heldout"
+  ],
+  "dev_count": 3,
+  "test_count": 2,
+  "notes": "Split on document boundaries, not individual items, so near-duplicate questions cannot leak across dev and test. RFP-D and RFP-E are sealed: they live in data/eval/sealed/, outside data/incoming/, so ingestion cannot reach them. They must not be used for development or prompt tuning.",
+  "hashes": {
+    "RFP-D_golden": "ff8e8eaeb7c92a3d5512ad114260d02ef35cf0795049a7b70aea1074bcd2b134",
+    "RFP-D_test_heldout": "f2c4ece5f9d5e9a98929fc449a70477b8f9f35f66383256d7be687bee2bb8aca",
+    "RFP-E_golden": "d4187cf7a69420f2f5baa6376af49eb50b69a63637a66a00d3cd7c3653b15d58",
+    "RFP-E_test_heldout": "0029015ace25aa804a99494e8a10f6b7911ed5a3d29753f8c5d3c56282dad73c"
+  }
+}

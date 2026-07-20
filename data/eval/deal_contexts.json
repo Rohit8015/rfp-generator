@@ -1,0 +1,82 @@
+{
+  "deal_contexts": [
+    {
+      "scenario_id": "DC-001",
+      "name": "Prime Banking Client - Strategic Partnership",
+      "description": "Top-3 private bank with ₹5 lakh crore AUM, existing relationship (3 years, 2 projects), strong executive sponsorship",
+      "fit_percentage": 95,
+      "incumbent_strength": "STRONG",
+      "relationship_depth": "DEEP",
+      "entry_timing": "EARLY",
+      "competitor_count": 2,
+      "deal_size_ratio": 1.2,
+      "bid_decision": "BID",
+      "rationale": "Established relationship, strong fit, strategic importance"
+    },
+    {
+      "scenario_id": "DC-002",
+      "name": "Healthcare Provider - Major Transformation",
+      "description": "Large hospital chain with 50+ hospitals, new client, major digital transformation program, strong reference in healthcare",
+      "fit_percentage": 88,
+      "incumbent_strength": "WEAK",
+      "relationship_depth": "NEW",
+      "entry_timing": "EARLY",
+      "competitor_count": 3,
+      "deal_size_ratio": 1.5,
+      "bid_decision": "BID",
+      "rationale": "Strong fit with healthcare credentials, opportunity to establish beachhead"
+    },
+    {
+      "scenario_id": "DC-003",
+      "name": "Government Smart City - Large Deal",
+      "description": "₹500 crore smart city project, 40+ departments, complex integration, political sensitivity, high compliance requirements",
+      "fit_percentage": 75,
+      "incumbent_strength": "MEDIUM",
+      "relationship_depth": "LIMITED",
+      "entry_timing": "MID",
+      "competitor_count": 5,
+      "deal_size_ratio": 0.8,
+      "bid_decision": "BID",
+      "rationale": "Experienced in smart cities, but competition intense and relationship limited"
+    },
+    {
+      "scenario_id": "DC-004",
+      "name": "Insurance Company - Legacy Modernization",
+      "description": "Large insurance company, 20-year-old legacy systems, high-risk transformation, limited internal IT capability",
+      "fit_percentage": 70,
+      "incumbent_strength": "STRONG",
+      "relationship_depth": "MODERATE",
+      "entry_timing": "LATE",
+      "competitor_count": 4,
+      "deal_size_ratio": 0.7,
+      "bid_decision": "NO_BID",
+      "rationale": "Incumbent has deep relationship, late entry makes competitive positioning difficult"
+    },
+    {
+      "scenario_id": "DC-005",
+      "name": "NBFC - Digital Lending Platform",
+      "description": "Mid-sized NBFC with ₹12,000 crore AUM, seeking complete digital transformation, no existing IT partner",
+      "fit_percentage": 90,
+      "incumbent_strength": "NONE",
+      "relationship_depth": "MODERATE",
+      "entry_timing": "EARLY",
+      "competitor_count": 3,
+      "deal_size_ratio": 0.9,
+      "bid_decision": "BID",
+      "rationale": "Perfect fit for our capabilities, no incumbent advantage, right timing"
+    },
+    {
+      "scenario_id": "DC-006",
+      "name": "Retail Bank - CRM & Analytics",
+      "description": "Large retail bank with 50M+ customers, seeking Salesforce implementation and analytics, but requires significant price discount",
+      "fit_percentage": 85,
+      "incumbent_strength": "MEDIUM",
+      "relationship_depth": "LIMITED",
+      "entry_timing": "EARLY",
+      "competitor_count": 4,
+      "deal_size_ratio": 0.5,
+      "bid_decision": "PARTNER_BID",
+      "rationale": "Good fit but price pressure is extreme; partner with Salesforce to improve competitive position"
+    }
+  ]
+}

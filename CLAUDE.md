@@ -40,6 +40,31 @@ A live end-to-end run was not reachable locally.
 - Never hardcode retrieval thresholds; read them from the calibration output in config.
 - Keep secrets in .env. Never commit keys or client data.
 
+## Data hygiene (non-negotiable)
+- **Sealed test set.** `data/eval/sealed/` holds RFP-D, RFP-E and their golden outputs.
+  Never read them, never tune against them, never ingest them. They are deliberately
+  outside `data/incoming/` so ingestion cannot reach them. Hashes are in
+  `data/eval/split.json`; if a hash changes, every metric after that point is
+  contaminated and must be reported as such.
+- **Ingestion reads exactly four directories:** knowledge_base, historical_rfps,
+  proof_library, templates. It must never read data/eval, data/incoming or
+  data/archive_xcd. Assert this in tests.
+- **Split on document boundaries, never on items.** Dev is RFP-A/B/C, test is RFP-D/E.
+  Splitting individual questions leaks near-duplicates across the boundary and inflates
+  every metric.
+
+## Label mapping (dataset vs contracts)
+The supplied dataset labels do not use the plan's enums. The contracts in
+`src/models/schemas.py` are authoritative because they drive behaviour; dataset labels
+are translated on load, never the reverse.
+- `deliverable_form`: the dataset labels what the client is buying (PLATFORM, AI_MODEL,
+  SLA...). The contract labels how a section is rendered (PROSE, TABLE, GANTT...) and is
+  what routes A9 to a writer. Map dataset -> contract in the eval loader.
+- `req_type`: the dataset uses SHALL/SHOULD/MAY_REQUIREMENT, which is perfectly
+  correlated with its own `priority` field and therefore carries no extra information.
+  Derive the contract's six-way `req_type` from the requirement text; take `priority`
+  from the dataset directly, since those values already match.
+
 ## Demo discipline
 - The demo is a live end-to-end run in a classroom. Latency and rate limits are
   first-class design constraints, not afterthoughts.
