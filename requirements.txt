@@ -5,10 +5,15 @@
 pydantic>=2.7
 pydantic-settings>=2.3
 
-# --- LLM (local, via Ollama HTTP API) ---
+# --- LLM providers ---
+# Generation runs on free-tier cloud; Ollama is the offline degradation path.
+# All three cloud SDKs are optional at import time — provider.py degrades if absent.
 httpx>=0.27
+groq>=0.11
+google-genai>=0.3
+huggingface-hub>=0.24
 
-# --- Embeddings & reranking (local) ---
+# --- Embeddings & reranking (local — deliberately not cloud, see CLAUDE.md) ---
 sentence-transformers>=3.0
 torch>=2.2
 

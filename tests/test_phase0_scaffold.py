@@ -97,15 +97,50 @@ def test_root_files_exist() -> None:
         assert (ROOT / f).is_file(), f"missing {f}"
 
 
-def test_settings_load_without_env_file() -> None:
-    """Zero-cost constraint: defaults must be usable with no .env and no cloud key."""
+def test_settings_load_with_defaults() -> None:
+    """Settings must resolve with no .env present."""
     from config import get_settings
 
     s = get_settings()
-    assert s.llm_provider == "ollama"
-    assert s.gemini_api_key == ""
-    assert s.groq_api_key == ""
     assert s.sqlite_path.name == "rfp_copilot.db"
+    assert s.embedding_model.startswith("BAAI/"), "embeddings stay local per CLAUDE.md"
+
+
+def test_provider_chain_parses_and_validates() -> None:
+    from config import KNOWN_PROVIDERS, Settings
+
+    s = Settings(llm_provider_chain="groq, gemini ,huggingface")
+    assert s.provider_chain == ["groq", "gemini", "huggingface"]
+    assert all(p in KNOWN_PROVIDERS for p in s.provider_chain)
+
+    with pytest.raises(ValueError, match="unknown provider"):
+        Settings(llm_provider_chain="groq,openai").provider_chain
+    with pytest.raises(ValueError, match="empty"):
+        Settings(llm_provider_chain="  ").provider_chain
+
+
+def test_ollama_needs_no_key_but_cloud_does() -> None:
+    """Ollama is the offline degradation path and must stay usable with no credentials."""
+    from config import Settings
+
+    s = Settings(groq_api_key="", llm_provider_chain="groq,ollama")
+    assert s.provider("ollama").configured is True
+    assert s.provider("groq").configured is False
+    assert [p.name for p in s.available_providers()] == ["ollama"]
+
+
+def test_provider_repr_never_leaks_the_key() -> None:
+    from config import Settings
+
+    s = Settings(groq_api_key="gsk_supersecret_value")
+    assert "supersecret" not in repr(s.provider("groq"))
+
+
+def test_tier_selects_distinct_models() -> None:
+    from config import Settings
+
+    p = Settings().provider("groq")
+    assert p.model_for("cheap") != p.model_for("strong")
 
 
 def test_no_llm_calls_outside_provider() -> None:
@@ -122,8 +157,8 @@ def test_no_llm_calls_outside_provider() -> None:
 @pytest.mark.skipif(
     os.environ.get("RFP_SKIP_OLLAMA") == "1", reason="RFP_SKIP_OLLAMA=1"
 )
-def test_ollama_responds() -> None:
-    """Phase 0 gate: the local model answers. Skips (loudly) if Ollama is absent."""
+def test_offline_fallback_model_available() -> None:
+    """Ollama is the offline degradation path, not the primary. Skips loudly if absent."""
     httpx = pytest.importorskip("httpx")
     from config import get_settings
 
@@ -134,6 +169,7 @@ def test_ollama_responds() -> None:
         pytest.skip(f"Ollama not reachable at {s.ollama_base_url}: {exc}")
     assert r.status_code == 200
     names = [m["name"] for m in r.json().get("models", [])]
-    assert any(n.startswith("qwen2.5:7b") for n in names), (
-        f"qwen2.5:7b-instruct not pulled; found {names}"
+    want = s.ollama_model_cheap
+    assert any(n.startswith(want.split(":")[0] + ":" + want.split(":")[1][:2]) for n in names), (
+        f"offline fallback model {want} not pulled; found {names}"
     )
