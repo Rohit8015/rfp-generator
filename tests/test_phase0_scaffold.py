@@ -143,6 +143,53 @@ def test_tier_selects_distinct_models() -> None:
     assert p.model_for("cheap") != p.model_for("strong")
 
 
+def test_no_secrets_in_tracked_files() -> None:
+    """CLAUDE.md: never commit a key.
+
+    .env.example is tracked, so every *_API_KEY in it must stay empty. Real keys belong
+    in .env, which is gitignored. This test exists because the two filenames are one
+    tab-completion apart.
+    """
+    import re
+
+    offenders = []
+    for name in [".env.example", "README.md", "CLAUDE.md"]:
+        path = ROOT / name
+        if not path.is_file():
+            continue
+        for line in path.read_text(encoding="utf-8").splitlines():
+            m = re.match(r"^\s*([A-Z_]*(?:API_KEY|TOKEN|SECRET))\s*=\s*(\S+)", line)
+            if m:
+                offenders.append(f"{name}: {m.group(1)} has a value")
+    # Catch a pasted key anywhere in a tracked file, even outside an assignment.
+    # Groq gsk_, HuggingFace hf_, Google AIza (legacy) and AQ. (current AI Studio format).
+    key_shapes = re.compile(
+        r"(gsk_[A-Za-z0-9]{20,}"
+        r"|hf_[A-Za-z0-9]{20,}"
+        r"|AIza[A-Za-z0-9_\-]{30,}"
+        r"|AQ\.[A-Za-z0-9_\-]{30,})"
+    )
+    for path in ROOT.rglob("*"):
+        if not path.is_file() or ".git" in path.parts or ".venv" in path.parts:
+            continue
+        if path.name == ".env" or path.suffix not in {".py", ".md", ".txt", ".json", ".example"}:
+            continue
+        if path.name == ".env.example" or path.suffix in {".py", ".md", ".txt", ".json"}:
+            try:
+                if key_shapes.search(path.read_text(encoding="utf-8", errors="ignore")):
+                    offenders.append(f"{path.relative_to(ROOT)}: contains a key-shaped string")
+            except OSError:
+                pass
+
+    assert not offenders, "secrets in tracked files: " + "; ".join(offenders)
+
+
+def test_env_is_gitignored() -> None:
+    """The file that holds real keys must never be committable."""
+    ignore = (ROOT / ".gitignore").read_text(encoding="utf-8").splitlines()
+    assert ".env" in [line.strip() for line in ignore], ".env must be gitignored"
+
+
 def test_no_llm_calls_outside_provider() -> None:
     """CLAUDE.md: no module may reach Ollama except src/llm/provider.py."""
     offenders = []

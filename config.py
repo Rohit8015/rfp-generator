@@ -75,7 +75,7 @@ class Settings(BaseSettings):
     # --- Models per tier ---
     groq_model_cheap: str = "llama-3.1-8b-instant"
     groq_model_strong: str = "llama-3.3-70b-versatile"
-    gemini_model_cheap: str = "gemini-2.5-flash-lite"
+    gemini_model_cheap: str = "gemini-3.1-flash-lite"
     gemini_model_strong: str = "gemini-2.5-flash"
     huggingface_model_cheap: str = "meta-llama/Llama-3.1-8B-Instruct"
     huggingface_model_strong: str = "meta-llama/Llama-3.3-70B-Instruct"

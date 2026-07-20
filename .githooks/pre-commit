@@ -1,0 +1,46 @@
+#!/bin/sh
+# Block any commit that would put key material into git history.
+# Install with:  git config core.hooksPath .githooks
+#
+# This exists because .env (gitignored, holds real keys) and .env.example (committed,
+# must stay empty) are one tab-completion apart, and the mistake was made once already.
+
+staged=$(git diff --cached --name-only --diff-filter=ACM)
+[ -z "$staged" ] && exit 0
+
+fail=0
+
+for f in $staged; do
+    [ -f "$f" ] || continue
+
+    # A committed .env is always wrong.
+    case "$f" in
+        .env|*/.env)
+            echo "BLOCKED: $f must never be committed. It holds real keys."
+            fail=1
+            continue
+            ;;
+    esac
+
+    # Provider key shapes: Groq gsk_, HuggingFace hf_, Google AIza and AQ.
+    if git show ":$f" | grep -Eq '(gsk_[A-Za-z0-9]{20,}|hf_[A-Za-z0-9]{20,}|AIza[A-Za-z0-9_-]{30,}|AQ\.[A-Za-z0-9_-]{30,})'; then
+        echo "BLOCKED: $f contains a string shaped like an API key."
+        fail=1
+    fi
+
+    # A non-empty key assignment in any tracked file.
+    if git show ":$f" | grep -Eq '^[A-Z_]*(API_KEY|TOKEN|SECRET)[[:space:]]*=[[:space:]]*[^[:space:]]'; then
+        echo "BLOCKED: $f assigns a value to a key/token/secret variable."
+        fail=1
+    fi
+done
+
+if [ "$fail" -ne 0 ]; then
+    echo ""
+    echo "Commit aborted. Move the value into .env (gitignored) and leave the"
+    echo "tracked template empty. To override in a genuine false positive:"
+    echo "    git commit --no-verify"
+    exit 1
+fi
+
+exit 0
