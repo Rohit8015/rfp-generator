@@ -1,25 +1,32 @@
-# Secrets and client data — never commit
+# Secrets — never commit
 .env
 
-# Generated state
+# Generated state, rebuilt by `python -m src.ingestion.ingest` and `.calibrate`
 db/*.db
 db/chroma/
 db/*.pkl
-output/
+db/llm_cache/
 config/thresholds.json
-calibration_report.md
 evaluation_report.md
 
-# Source documents are never committed (plan section 10: synthetic and public data
-# only; CLAUDE.md: never commit client data). Synthetic seed corpora and the labelled
-# eval sets ARE committed, so they stay .md / .json / .txt and survive these rules.
-data/incoming/*
-!data/incoming/.gitkeep
+# The calibration report is a project deliverable and records the dataset's label
+# defect, so it is committed even though it is generated.
+output/*
+!output/calibration_report.md
+
+# Source documents dropped in by hand are never committed (plan section 10: synthetic
+# and public data only; CLAUDE.md: never commit client data). The synthetic dev RFPs and
+# the labelled eval sets ARE committed, so a fresh clone runs end to end -- they stay
+# .md / .json / .csv / .yaml and are exempted below.
 data/**/*.pdf
 data/**/*.docx
 data/**/*.doc
 data/**/*.xlsx
 data/**/*.pptx
+
+# Unrelated documents at the repo root
+/*.pptx
+/*.docx
 
 # Python
 __pycache__/

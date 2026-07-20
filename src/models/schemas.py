@@ -130,6 +130,76 @@ Unit = Annotated[float, Field(ge=0.0, le=1.0)]
 
 
 # --------------------------------------------------------------------------------------
+# Ingestion and calibration
+# --------------------------------------------------------------------------------------
+
+
+class ChunkKind(str, Enum):
+    HISTORICAL_QA = "HISTORICAL_QA"
+    KNOWLEDGE_BASE = "KNOWLEDGE_BASE"
+    PROOF_POINT = "PROOF_POINT"
+    TEMPLATE = "TEMPLATE"
+
+
+class Chunk(Contract):
+    """One retrievable unit of the corpus.
+
+    `source_id` is the stable public identifier (HQ-014, KB-003, PP-001) that the
+    labelled retrieval set refers to. `id` is unique per chunk, since one knowledge base
+    document yields several. Retrieval metrics are scored on source_id.
+    """
+
+    id: str
+    source_id: str
+    kind: ChunkKind
+    text: str
+    source_ref: str
+    title: str = ""
+    tags: list[str] = Field(default_factory=list)
+    metadata: dict[str, str] = Field(default_factory=dict)
+
+    @model_validator(mode="after")
+    def _text_is_substantive(self) -> Chunk:
+        if not self.text.strip():
+            raise ValueError(f"chunk {self.id} has no text")
+        return self
+
+
+class CalibrationThresholds(Contract):
+    """Retrieval decision boundaries derived from the corpus, never hardcoded.
+
+    A ContextPack must cite the `version` that produced its reuse_decision, which is what
+    makes the plan's anti-hardcoding rule structurally enforceable.
+    """
+
+    version: str
+    method: str
+    embedding_model: str
+    reuse_min: float = Field(ge=-1.0, le=1.0)
+    adapt_min: float = Field(ge=-1.0, le=1.0)
+    n_pairs: int = Field(ge=0)
+    observed: dict[str, dict[str, float]] = Field(default_factory=dict)
+    separation: float | None = None
+
+    @model_validator(mode="after")
+    def _bands_are_ordered(self) -> CalibrationThresholds:
+        if self.reuse_min <= self.adapt_min:
+            raise ValueError(
+                f"reuse_min ({self.reuse_min}) must exceed adapt_min ({self.adapt_min}); "
+                "otherwise the ADAPT band is empty or inverted"
+            )
+        return self
+
+    def decide(self, score: float) -> ReuseDecision:
+        """Map a top-1 similarity onto a reuse decision."""
+        if score >= self.reuse_min:
+            return ReuseDecision.REUSE
+        if score >= self.adapt_min:
+            return ReuseDecision.ADAPT
+        return ReuseDecision.SYNTHESIZE
+
+
+# --------------------------------------------------------------------------------------
 # Plane 1 — Comprehension
 # --------------------------------------------------------------------------------------
 

@@ -28,11 +28,18 @@ for f in $staged; do
         fail=1
     fi
 
-    # A non-empty key assignment in any tracked file.
-    if git show ":$f" | grep -Eq '^[A-Z_]*(API_KEY|TOKEN|SECRET)[[:space:]]*=[[:space:]]*[^[:space:]]'; then
-        echo "BLOCKED: $f assigns a value to a key/token/secret variable."
-        fail=1
-    fi
+    # A non-empty key assignment, in config-shaped files only. Python source is exempt:
+    # `_TOKEN = re.compile(...)` is ordinary code, not a leaked secret. Source files are
+    # still covered by the key-shape check above, which is what actually matters.
+    case "$f" in
+        *.py|*.pyi) ;;
+        *)
+            if git show ":$f" | grep -Eq '^[A-Z_]*(API_KEY|TOKEN|SECRET)[[:space:]]*=[[:space:]]*[^[:space:]]'; then
+                echo "BLOCKED: $f assigns a value to a key/token/secret variable."
+                fail=1
+            fi
+            ;;
+    esac
 done
 
 if [ "$fail" -ne 0 ]; then
