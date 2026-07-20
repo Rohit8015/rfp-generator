@@ -12,13 +12,13 @@ with zero human input, reported per section type.
 
 ## Status
 
-Phase 0 of 12 complete — scaffold only. See `RFP_Copilot_v2_Build_Plan.md` for the full
-plan and `CLAUDE.md` for the working conventions every phase must respect.
+Phase 1 of 12 complete. See `RFP_Copilot_v2_Build_Plan.md` for the full plan and
+`CLAUDE.md` for the working conventions every phase must respect.
 
 | Phase | Scope | Status |
 |---|---|---|
 | 0 | Scaffold, config, contracts-as-docstrings | done |
-| 1 | Data layer: SQLite schema + pydantic contracts | not started |
+| 1 | Data layer: SQLite schema + pydantic contracts | done |
 | 2 | Provider wrapper, ingestion, threshold calibration | not started |
 | 3–12 | Agents, assurance, orchestration, dashboard, evaluation | not started |
 
