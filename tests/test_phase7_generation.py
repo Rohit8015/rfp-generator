@@ -179,12 +179,33 @@ def test_compliance_section_forces_stakeholder() -> None:
     assert "Drafted prose" not in out.content_md
 
 
-def test_legal_requirement_forces_stakeholder() -> None:
+def test_lone_legal_requirement_is_carved_out_not_escalated() -> None:
+    """One legal requirement among ordinary ones is carved out; the rest still draft.
+
+    Escalating the whole section would hand a human the requirements they did not need
+    to write. Only a section whose SUBJECT is compliance or legal goes wholesale.
+    """
+    router = GenerationRouter(provider=StubProvider("## X\n\nDrafted prose here.\n"))
+    legal = _requirement("R-002",
+                         "The vendor shall accept unlimited liability for breach.")
+    ordinary = _requirement("R-001", "The vendor shall implement a lending platform.")
+    section = _section(requirement_ids=["R-001", "R-002"])
+
+    out = router.generate(section, BUYER, _pack(), [ordinary, legal], [], [])
+    assert out.status is SectionStatus.DRAFTED, "the whole section should not escalate"
+    assert "Drafted prose" in out.content_md, "the evidenced requirement was not drafted"
+    assert "R-002" in out.content_md, "the legal requirement was not carved out visibly"
+    assert any(r.kind is ProvenanceKind.STAKEHOLDER for r in out.sentences)
+    assert out.automated() is False, "a carve-out means the section still needed a human"
+
+
+def test_all_legal_section_escalates_wholesale() -> None:
     router = GenerationRouter(provider=StubProvider("## X\n\nDrafted prose.\n"))
-    req = _requirement(text="The vendor shall accept unlimited liability for breach.")
-    out = router.generate(_section(), BUYER, _pack(), [req], [], [])
+    section = _section(title="Legal terms and conditions",
+                       purpose="Contractual liability and indemnities")
+    out = router.generate(_section(title=section.title, purpose=section.purpose),
+                          BUYER, _pack(), [_requirement()], [], [])
     assert out.status is SectionStatus.ESCALATED
-    assert "liability" in " ".join(out.content_md.lower().splitlines())
 
 
 def test_guardrail_runs_before_any_model_call() -> None:

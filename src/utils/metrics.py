@@ -119,6 +119,24 @@ def automation_rate(sections) -> float:
     return 100.0 * sum(1 for s in sections if s.automated()) / len(sections)
 
 
+def sentence_automation_rate(sections) -> float:
+    """Share of SENTENCES produced without human input.
+
+    A weaker measure than `automation_rate`, and reported alongside it rather than
+    instead of it. The section-level rate is the honest headline: a section needing one
+    human sentence is a section a human must open. But when most sections carry a small
+    carve-out, the section rate collapses to zero and stops distinguishing a document
+    that is 95% drafted from one that is 5% drafted. This says which.
+    """
+    records = [r for s in sections for r in s.sentences]
+    if not records:
+        return 0.0
+    from src.models.schemas import ProvenanceKind as _Kind
+
+    automated = sum(1 for r in records if r.kind is not _Kind.STAKEHOLDER)
+    return round(100.0 * automated / len(records), 1)
+
+
 def automation_rate_by_form(sections) -> dict[str, float]:
     """Automation rate per deliverable form. The plan reports per section type."""
     buckets: dict[str, list] = {}

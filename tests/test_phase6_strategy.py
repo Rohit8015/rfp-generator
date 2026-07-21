@@ -110,11 +110,54 @@ def test_every_match_explains_itself(matches) -> None:
     assert all(m.rationale.strip() for m in matches)
 
 
-def test_matcher_makes_no_model_call() -> None:
-    source = (ROOT / "src" / "agents" / "proofs.py").read_text(encoding="utf-8")
-    lowered = source.lower()
-    for forbidden in ["get_provider", "generate(", "embed("]:
-        assert forbidden not in lowered, f"proofs.py calls {forbidden}"
+def test_matcher_makes_no_generative_call() -> None:
+    """A7 may measure, but must never ask a model for a judgement.
+
+    It uses the LOCAL cross-encoder to score relevance, which is a measurement. It must
+    not call generate(): a model asked "does this proof support this requirement?"
+    answers yes far too readily, and a false STRONG puts an unevidenced claim in front
+    of a client.
+    """
+    source = (ROOT / "src" / "agents" / "proofs.py").read_text(encoding="utf-8").lower()
+    assert ".generate(" not in source, "proofs.py makes a generative call"
+    assert "generate_many" not in source, "proofs.py makes a generative call"
+
+
+def test_matcher_degrades_to_lexical_without_a_reranker(pipeline) -> None:
+    """No provider means a worse matcher, not a crashed one."""
+    _, reqs, _, proofs = pipeline
+    matches = ProofMatcher(proofs, use_embeddings=False).match(reqs[:10])
+    assert len(matches) == 10
+    assert all(m.rationale for m in matches)
+
+
+def test_cross_encoder_separates_covered_from_uncovered(pipeline) -> None:
+    """The library covers fraud detection and RBI compliance; it has nothing on
+    multilingual UI, AR/VR, gamification or social listening.
+    """
+    _, reqs, _, proofs = pipeline
+    matches = {m.requirement_id: m for m in ProofMatcher(proofs).match(reqs)}
+
+    def fit_for(fragment: str):
+        # Single-topic requirements only. The extractor also emits one blob holding the
+        # whole weighted-requirements table, which spans many topics at once and is
+        # rightly PARTIAL against almost anything.
+        found = [r for r in reqs
+                 if fragment.lower() in r.text.lower() and len(r.text) < 130]
+        return [matches[r.id].fit for r in found]
+
+    for fragment in ["social media listening", "multi-lingual", "gamification", "AR/VR"]:
+        fits = fit_for(fragment)
+        assert fits, f"no requirement mentioning {fragment!r}"
+        assert all(f is Fit.GAP for f in fits), (
+            f"{fragment!r} should be a GAP: the library has no such proof, got {fits}"
+        )
+
+    for fragment in ["RBI guidelines", "fraud detection"]:
+        fits = fit_for(fragment)
+        assert fits and all(f is not Fit.GAP for f in fits), (
+            f"{fragment!r} should be evidenced, got {fits}"
+        )
 
 
 # --------------------------------------------------------------------------------------

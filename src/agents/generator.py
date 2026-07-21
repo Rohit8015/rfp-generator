@@ -68,16 +68,51 @@ class GenerationRouter:
     ) -> GeneratedSection:
         requirements = requirements or []
         section_reqs = [r for r in requirements if r.id in set(section.requirement_ids)]
+        gap_ids = {m.requirement_id for m in (proof_matches or []) if m.fit is Fit.GAP}
+        carved_out = [
+            r for r in section_reqs
+            if r.id in gap_ids or _GUARDED_TOPICS.search(r.text)
+        ]
+        carved_ids = {r.id for r in carved_out}
+        evidenced = [r for r in section_reqs if r.id not in carved_ids]
 
         reason = self.guardrail_reason(section, section_reqs, proof_matches or [])
         if reason:
             generated = self._stakeholder_brief(section, section_reqs, reason)
         else:
-            generated = self._dispatch(section, buyer, pack, section_reqs, themes or [],
+            generated = self._dispatch(section, buyer, pack, evidenced, themes or [],
                                        failure_reason)
+            if carved_out and generated.status is SectionStatus.DRAFTED:
+                self._carve_out(generated, carved_out)
 
         provenance.verify_complete(generated)
         return generated
+
+    @staticmethod
+    def _carve_out(section: GeneratedSection, requirements: list[Requirement]) -> None:
+        """Draft what is evidenced; hand the rest to a human, in the section itself.
+
+        One unevidenced requirement should not block a section covering nine others.
+        A bid team drafts what it can prove and carves out the rest, and the carve-out
+        must be visible in the document rather than living only in a task list.
+
+        The note carries STAKEHOLDER provenance, so the section correctly stops counting
+        as automated: it did need a human.
+        """
+        lines = [
+            "",
+            "> **Requires input before submission.** The following requirements in this "
+            "section are unevidenced or are compliance and legal matters, and have not "
+            "been drafted:",
+        ]
+        lines += [f"> - {r.id} ({r.priority.value}): {r.text}" for r in requirements]
+        addition = "\n".join(lines) + "\n"
+
+        section.content_md = section.content_md.rstrip() + "\n" + addition
+        section.sentences.extend(provenance.record_sentences(
+            section.section_id, addition, ProvenanceKind.STAKEHOLDER,
+            start_index=len(section.sentences),
+        ))
 
     # --- guardrail ------------------------------------------------------------------
 
@@ -87,12 +122,18 @@ class GenerationRouter:
         requirements: list[Requirement],
         proof_matches: list[ProofMatch],
     ) -> str | None:
-        """Why this section must go to a human, or None if it may be drafted."""
+        """Why this section must go to a human, or None if it may be drafted.
+
+        A GAP escalates the whole section only when EVERY requirement in it is a GAP.
+        A section with one unevidenced requirement among nine is still worth drafting;
+        the odd one out is carved out visibly instead. Escalating the lot would hand a
+        human nine requirements they did not need to write.
+        """
         gaps = {m.requirement_id for m in proof_matches if m.fit is Fit.GAP}
         gap_hits = [r.id for r in requirements if r.id in gaps]
-        if gap_hits:
+        if requirements and len(gap_hits) == len(requirements):
             return (
-                "covers requirements with no supporting proof point: "
+                "every requirement in this section lacks a supporting proof point: "
                 + ", ".join(sorted(gap_hits))
             )
 
@@ -100,11 +141,10 @@ class GenerationRouter:
         if _GUARDED_TOPICS.search(haystack):
             return f"section subject matter is compliance or legal: {section.title}"
 
-        guarded_reqs = [r.id for r in requirements if _GUARDED_TOPICS.search(r.text)]
-        if guarded_reqs:
-            return (
-                "covers compliance or legal requirements: " + ", ".join(sorted(guarded_reqs))
-            )
+        # An individual compliance or legal requirement inside an otherwise ordinary
+        # section is carved out, not escalated with the whole section. Escalating the lot
+        # would hand a human nine requirements they did not need to write, which is the
+        # same mistake the GAP rule made before it was narrowed.
         return None
 
     @staticmethod
