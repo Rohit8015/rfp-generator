@@ -134,7 +134,11 @@ class TokenBucket:
 # Backends
 # --------------------------------------------------------------------------------------
 
-_RATE_LIMIT_MARKERS = ("429", "rate limit", "resource_exhausted", "quota", "too many requests")
+#: 402 belongs here rather than with the outages: HuggingFace returns Payment Required
+#: when an account's free inference credits run out, which is a quota condition. Treating
+#: it as a rate limit means the chain moves on to the next provider instead of retrying.
+_RATE_LIMIT_MARKERS = ("429", "402", "rate limit", "resource_exhausted", "quota",
+                       "too many requests", "payment required", "credits")
 _UNAVAILABLE_MARKERS = ("503", "500", "502", "504", "unavailable", "overloaded",
                         "not_found", "404", "disconnected", "high demand")
 

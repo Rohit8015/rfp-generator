@@ -408,11 +408,27 @@ def _live(name: str):
     return P.LLMProvider(Settings(llm_provider_chain=name, llm_cache_enabled=False))
 
 
+def _skip_if_out_of_quota(exc: Exception, name: str) -> None:
+    """An exhausted free tier is an account state, not a code defect.
+
+    HuggingFace returns 402 Payment Required once an account's monthly inference credits
+    are spent. The chain handles that by failing over, which is the behaviour under test
+    elsewhere; a single-provider test has nowhere to fail over to.
+    """
+    text = str(exc).lower()
+    if any(marker in text for marker in ("402", "payment required", "quota", "credits")):
+        pytest.skip(f"{name} free-tier quota is exhausted (402); failover covers this")
+    raise exc
+
+
 @pytest.mark.live
 @pytest.mark.parametrize("name", ["groq", "gemini", "huggingface"])
 def test_live_provider_answers(name: str) -> None:
     prov = _live(name)
-    r = prov.generate("Reply with exactly the word: ready", tier="cheap")
+    try:
+        r = prov.generate("Reply with exactly the word: ready", tier="cheap")
+    except P.AllProvidersFailed as exc:
+        _skip_if_out_of_quota(exc, name)
     assert "ready" in r.text.lower()
     assert r.provider == name
     assert r.total_tokens > 0, "token accounting must work for the runs table"
@@ -422,12 +438,15 @@ def test_live_provider_answers(name: str) -> None:
 @pytest.mark.parametrize("name", ["groq", "gemini", "huggingface"])
 def test_live_json_mode_validates(name: str) -> None:
     prov = _live(name)
-    r = prov.generate(
-        "Assess this bid: strong fit, incumbent supplier, 3 competitors. "
-        'Return JSON with keys "verdict" (BID or NO_BID) and "score" (integer 1-10).',
-        tier="cheap",
-        schema=Answer,
-    )
+    try:
+        r = prov.generate(
+            "Assess this bid: strong fit, incumbent supplier, 3 competitors. "
+            'Return JSON with keys "verdict" (BID or NO_BID) and "score" (integer 1-10).',
+            tier="cheap",
+            schema=Answer,
+        )
+    except P.AllProvidersFailed as exc:
+        _skip_if_out_of_quota(exc, name)
     assert isinstance(r.parsed, Answer)
     assert r.parsed.verdict in {"BID", "NO_BID"}
 
