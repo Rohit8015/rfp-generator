@@ -130,6 +130,9 @@ class Orchestrator:
             self._provider, use_llm=self.use_llm).profile(tree))
 
         # --- Plane 2: strategy -------------------------------------------------------
+        # A7 runs before A5 and A6 by necessity: themes must cite proof points, and the
+        # architect needs to know which requirements are unevidenced. The progress label
+        # leads with the step rather than the agent number so the order reads sensibly.
         report("A7", "matching proof points")
         proofs = ProofMatcher.load_library(self.settings)
         result.proof_matches = self._timed(

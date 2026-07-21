@@ -196,31 +196,42 @@ class GenerationRouter:
             return self._structured.write(section, buyer, pack, requirements,
                                           failure_reason)
 
-        if form in (DeliverableForm.COSTING, DeliverableForm.GANTT, DeliverableForm.CHART):
-            # Phase 8 owns these. Until then they are escalated rather than guessed at
-            # in prose, which would put invented numbers in front of a client.
-            return self._deferred(section, form)
+        if form is DeliverableForm.COSTING:
+            return self._costing(section)
+
+        if form in (DeliverableForm.GANTT, DeliverableForm.CHART):
+            return self._visual(section)
 
         return self._narrative.write(section, buyer, pack, themes, failure_reason)
 
-    @staticmethod
-    def _deferred(section: OutlineSection, form: DeliverableForm) -> GeneratedSection:
-        content = (
-            f"## {section.title}\n\n"
-            f"This section renders as {form.value} and is produced by the deterministic "
-            f"{'cost model' if form is DeliverableForm.COSTING else 'visual generator'}, "
-            f"which is not yet wired in.\n"
-        )
-        return GeneratedSection(
-            section_id=section.id,
-            title=section.title,
-            deliverable_form=form,
-            content_md=content,
-            sentences=provenance.record_sentences(
-                section.id, content, ProvenanceKind.STAKEHOLDER
-            ),
-            status=SectionStatus.ESCALATED,
-        )
+    def _costing(self, section: OutlineSection) -> GeneratedSection:
+        """Deterministic cost model. Escalates rather than inventing figures."""
+        try:
+            return self._quant.write(section)
+        except Exception as exc:  # noqa: BLE001 - no parameters means no cost model
+            log.warning("cost model unavailable for %s: %s", section.id, exc)
+            return self._stakeholder_brief(
+                section, [],
+                f"a cost model needs programme parameters, which are not available "
+                f"for this bid ({type(exc).__name__})",
+            )
+
+    def _visual(self, section: OutlineSection) -> GeneratedSection:
+        """Charts, drawn from the same cost model that produces the cost table.
+
+        A Gantt built from different numbers than the cost table is the classic
+        proposal error, so both read one model.
+        """
+        try:
+            model = self._quant.build(self._quant.load_params("standard"))
+            return self._visual_generator.write(section, model=model)
+        except Exception as exc:  # noqa: BLE001
+            log.warning("charts unavailable for %s: %s", section.id, exc)
+            return self._stakeholder_brief(
+                section, [],
+                f"charts need programme parameters, which are not available for this "
+                f"bid ({type(exc).__name__})",
+            )
 
     # --- writers --------------------------------------------------------------------
 
@@ -247,6 +258,22 @@ class GenerationRouter:
 
             self._writers["boilerplate"] = BoilerplateWriter(self.settings)
         return self._writers["boilerplate"]
+
+    @property
+    def _quant(self):
+        if "quant" not in self._writers:
+            from src.writers.quant_modeler import QuantModeler
+
+            self._writers["quant"] = QuantModeler(self.settings)
+        return self._writers["quant"]
+
+    @property
+    def _visual_generator(self):
+        if "visual" not in self._writers:
+            from src.writers.visual_generator import VisualGenerator
+
+            self._writers["visual"] = VisualGenerator(self.settings)
+        return self._writers["visual"]
 
 
 def stakeholder_pack(section_id: str) -> ContextPack:

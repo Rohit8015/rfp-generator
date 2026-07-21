@@ -58,6 +58,50 @@ def test_highlighter_wraps_sentences_without_losing_text() -> None:
     assert "HQ-001" in html, "source ids should appear in the tooltip"
 
 
+def test_highlighter_preserves_markdown_line_structure() -> None:
+    """Regression: newlines were replaced with <br>, so a heading swallowed the body.
+
+    A 20,000-character section body ended up inside a single <h2> at 36px, which made
+    the primary deliverable unreadable.
+    """
+    import app.dashboard as dashboard
+
+    body = "We deliver in phases."
+    section = GeneratedSection(
+        section_id="S-01", title="Approach", deliverable_form=DeliverableForm.PROSE,
+        content_md=f"## Approach\n\n{body}\n\nA second paragraph follows.\n",
+        sentences=[ProvenanceRecord(section_id="S-01", sentence_index=0, sentence=body,
+                                    kind=ProvenanceKind.ADAPTED, source_ids=["HQ-001"])],
+    )
+    html = dashboard._highlight(section)
+    assert "<br>" not in html, "line structure must survive for markdown to parse"
+    assert "\n" in html
+    lines = html.splitlines()
+    assert lines[0].strip() == "## Approach", "the heading must stay on its own line"
+    assert any(line.strip() == "" for line in lines), "blank lines separate blocks"
+
+
+def test_highlighter_leaves_table_rows_intact() -> None:
+    """Regression: wrapping a row in a span stopped it being a table row, so tables
+    rendered as literal pipe-delimited text.
+    """
+    import app.dashboard as dashboard
+
+    row = "| Technical | 35% | Workshop |"
+    section = GeneratedSection(
+        section_id="S-03", title="Criteria", deliverable_form=DeliverableForm.TABLE,
+        content_md=f"## Criteria\n\n| Criterion | Weight | Method |\n|---|---|---|\n{row}\n",
+        sentences=[ProvenanceRecord(section_id="S-03", sentence_index=0, sentence=row,
+                                    kind=ProvenanceKind.SYNTHESIZED,
+                                    source_ids=["HQ-001"])],
+    )
+    html = dashboard._highlight(section)
+    for line in html.splitlines():
+        if line.strip().startswith("|"):
+            assert "<span" not in line, f"a span inside a table row breaks it: {line}"
+    assert row in html
+
+
 def test_highlighter_handles_a_section_with_no_records() -> None:
     import app.dashboard as dashboard
 

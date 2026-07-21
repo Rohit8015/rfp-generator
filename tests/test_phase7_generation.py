@@ -237,18 +237,56 @@ def test_stakeholder_pack_needs_no_calibration() -> None:
 # --------------------------------------------------------------------------------------
 
 
-@pytest.mark.parametrize("form,expect_status", [
-    (DeliverableForm.COSTING, SectionStatus.ESCALATED),
-    (DeliverableForm.GANTT, SectionStatus.ESCALATED),
-    (DeliverableForm.CHART, SectionStatus.ESCALATED),
+@pytest.mark.parametrize("form", [
+    DeliverableForm.COSTING, DeliverableForm.GANTT, DeliverableForm.CHART,
 ])
-def test_phase8_forms_are_escalated_not_guessed(form, expect_status) -> None:
-    """Better to escalate than to put invented numbers in front of a client."""
-    router = GenerationRouter(provider=StubProvider("## X\n\nInvented figures.\n"))
+def test_quantitative_forms_are_computed_never_written(form) -> None:
+    """These route to the deterministic writers, and no model is consulted.
+
+    They previously emitted a "not yet wired in" placeholder, which meant a declared
+    section type had no generator behind it.
+    """
+    stub = StubProvider("## X\n\nInvented figures.\n")
+    router = GenerationRouter(provider=stub)
     out = router.generate(_section(form=form, title="Delivery plan"), BUYER, _pack(),
                           [_requirement(form=form)], [], [])
-    assert out.status is expect_status
+
+    assert out.status is SectionStatus.DRAFTED, "the deterministic writer did not run"
+    assert stub.prompts == [], "a deterministic writer must not call a model"
     assert "Invented figures" not in out.content_md
+    assert "not yet wired in" not in out.content_md
+    assert all(r.kind is ProvenanceKind.COMPUTED for r in out.sentences)
+
+
+def test_costing_section_reconciles() -> None:
+    router = GenerationRouter(provider=StubProvider(""))
+    out = router.generate(_section(form=DeliverableForm.COSTING, title="Commercials"),
+                          BUYER, _pack(), [], [], [])
+    assert "Total investment" in out.content_md
+    assert "|" in out.content_md, "the cost model should render a table"
+
+
+def test_chart_section_produces_image_assets() -> None:
+    router = GenerationRouter(provider=StubProvider(""))
+    out = router.generate(_section(form=DeliverableForm.GANTT, title="Delivery plan"),
+                          BUYER, _pack(), [], [], [])
+    assert out.asset_paths, "no chart was rendered"
+    assert all(Path(p).is_file() for p in out.asset_paths)
+
+
+def test_missing_programme_parameters_escalate_rather_than_invent(monkeypatch) -> None:
+    """No parameters means no cost model. Never guess a number."""
+    from src.writers.quant_modeler import QuantModeler
+
+    monkeypatch.setattr(QuantModeler, "load_params",
+                        lambda self, profile="standard": (_ for _ in ()).throw(
+                            FileNotFoundError("no params")))
+    out = GenerationRouter(provider=StubProvider("")).generate(
+        _section(form=DeliverableForm.COSTING, title="Commercials"),
+        BUYER, _pack(), [], [], [],
+    )
+    assert out.status is SectionStatus.ESCALATED
+    assert all(r.kind is ProvenanceKind.STAKEHOLDER for r in out.sentences)
 
 
 def test_appendix_routes_to_boilerplate() -> None:

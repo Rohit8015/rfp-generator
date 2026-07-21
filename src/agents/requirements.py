@@ -233,7 +233,19 @@ class RequirementExtractor:
         if len(text.split()) < _MIN_REQUIREMENT_WORDS:
             return False
         # Reject table separators and pure headings.
-        return not set(text) <= {"-", ":", "|", " "}
+        if set(text) <= {"-", ":", "|", " "}:
+            return False
+        # Reject blobs that swallowed several requirements at once. A candidate naming
+        # more than one requirement id is a chunk of the document, not a requirement,
+        # and it poisons everything downstream: proof matching scores it against every
+        # topic, and it appears in the UI as garbled concatenated text.
+        if len(set(re.findall(r"\b[A-Z]{1,4}-\d{2,4}\b", text))) > 1:
+            return False
+        # Reject anything carrying a horizontal rule or a heading marker: those are
+        # document structure that leaked into the capture.
+        if re.search(r"(^|\s)---+(\s|$)|(^|\s)###?\s", text):
+            return False
+        return True
 
     @staticmethod
     def _cue_word(text: str) -> str | None:

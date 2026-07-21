@@ -153,6 +153,24 @@ def test_precision_is_reported_and_reasonable(extracted, labelled) -> None:
     )
 
 
+def test_no_requirement_merges_several_others(extracted) -> None:
+    """Regression: a table blob captured R-022 through R-025 plus stray '---' markers
+    into one requirement, which then scored against every topic in proof matching and
+    displayed as garbled concatenated text.
+    """
+    import re as _re
+
+    merged = [
+        (r.id, r.text[:70]) for r in extracted
+        if len(set(_re.findall(r"\b[A-Z]{1,4}-\d{2,4}\b", r.text))) > 1
+    ]
+    assert not merged, f"requirements merged into one field: {merged}"
+
+    rules = [(r.id, r.text[:70]) for r in extracted
+             if _re.search(r"(^|\s)---+(\s|$)", r.text)]
+    assert not rules, f"horizontal rules leaked into requirement text: {rules}"
+
+
 def test_every_requirement_carries_cue_evidence(extracted) -> None:
     assert all(r.cue_evidence.strip() for r in extracted)
 

@@ -84,8 +84,13 @@ def _sidebar() -> None:
         live = st.toggle("Use models", value=True,
                          help="Off runs the deterministic path only: no model calls.")
 
-        providers = [p.name for p in settings.available_providers()]
-        st.caption(f"Provider chain: {' → '.join(providers) if providers else 'none configured'}")
+        if live:
+            providers = [p.name for p in settings.available_providers()]
+            st.caption(
+                f"Provider chain: {' → '.join(providers) if providers else 'none configured'}"
+            )
+        else:
+            st.caption("Deterministic path — no provider is used.")
 
         if st.button("Run pipeline", type="primary", use_container_width=True):
             path = _resolve_input(settings, picked, uploaded, choices[0])
@@ -117,13 +122,25 @@ def _run(path: Path, live: bool) -> None:
 
     status = st.sidebar.status("Running…", expanded=True)
     bar = st.sidebar.progress(0.0)
+    # Execution order, not numeric order. A7 precedes A5/A6 because win themes must cite
+    # proof points and the architect needs to know which requirements are unevidenced.
     stages = ["A1", "A2", "A3", "A7", "A5", "A6", "A8/A9", "A10-A13",
               "regen", "W1/W2", "W3", "done"]
+    labels = {
+        "A1": "Parsing the document", "A2": "Extracting requirements",
+        "A3": "Profiling the buyer", "A7": "Matching proof points",
+        "A5": "Generating win themes", "A6": "Designing the outline",
+        "A8/A9": "Retrieving and drafting", "A10-A13": "Checking the draft",
+        "regen": "Redrafting failures", "W1/W2": "Routing human tasks",
+        "W3": "Assembling the package", "done": "Complete",
+    }
 
     def progress(stage: str, message: str) -> None:
-        status.write(f"**{stage}** — {message}")
-        if stage in stages:
-            bar.progress((stages.index(stage) + 1) / len(stages))
+        step = stages.index(stage) + 1 if stage in stages else 0
+        heading = labels.get(stage, stage)
+        status.write(f"**{step}/{len(stages)} · {heading}** ({stage}) — {message}")
+        if step:
+            bar.progress(step / len(stages))
 
     try:
         st.session_state["result"] = Orchestrator(use_llm=live).run(path, progress=progress)
@@ -167,11 +184,31 @@ def _results() -> None:
     result = st.session_state["result"]
     report = result.package.report
 
+    # Short labels: at normal window width the cards clip anything longer, which made
+    # the two automation figures indistinguishable. The detail lives in the help text.
+    fully = sum(1 for s in result.sections if s.automated())
+    escalated = sum(1 for s in result.sections
+                    if s.status is SectionStatus.ESCALATED)
+    partial = len(result.sections) - fully - escalated
+
     a, b, c, d = st.columns(4)
-    a.metric("Automation (sections)", f"{report.overall_automation_rate:.0f}%")
-    b.metric("Automation (sentences)", f"{_sentence_rate(result):.0f}%")
-    c.metric("Requirement coverage", f"{report.compliance_coverage_pct:.0f}%")
-    d.metric("Evidence gaps", len(report.gap_requirement_ids))
+    a.metric("Sections clean", f"{fully}/{len(result.sections)}",
+             help="Sections where no sentence needed a human. Deliberately strict: one "
+                  "carved-out requirement disqualifies the whole section.")
+    b.metric("Sentences auto", f"{_sentence_rate(result):.0f}%",
+             help="Share of sentences produced without human input. The informative "
+                  "figure when most sections carry a small carve-out.")
+    c.metric("Coverage", f"{report.compliance_coverage_pct:.0f}%",
+             help="Requirements traced to drafted content, not merely planned for.")
+    d.metric("Evidence gaps", len(report.gap_requirement_ids),
+             help="Requirements with no supporting proof point. Carved out, never "
+                  "written around.")
+
+    if partial:
+        st.caption(
+            f"{fully} section(s) needed no human input · {partial} drafted with "
+            f"carve-outs · {escalated} escalated entirely."
+        )
 
     tabs = st.tabs([
         "Decide", "Requirements", "Draft", "Compliance", "Assurance", "Tasks", "Export",
@@ -202,8 +239,9 @@ def _decide(result) -> None:
     """Bid/no-bid and the gap list. The first thing worth knowing, so it is first."""
     st.subheader("Should we bid?")
     st.caption(
-        "The highest-return output is a well-reasoned no. Run the qualifier with the "
-        "commercial context of this pursuit."
+        "Set the commercial situation of this pursuit and the qualifier scores it. "
+        "The verdict below is a recommendation, not a gate — and a well-reasoned no "
+        "is worth as much as a yes, because it redirects the effort."
     )
 
     from src.agents.qualifier import BidQualifier, DealContext
@@ -264,6 +302,18 @@ def _requirements(result) -> None:
           "Requirement": r.text,
           "Found by": r.extracted_by} for r in result.requirements],
         use_container_width=True, hide_index=True, height=520,
+        # Status columns are pinned small and the long text column absorbs the rest, so
+        # Evidence and Section stay readable instead of being clipped to "PAR…".
+        column_config={
+            "ID": st.column_config.TextColumn(width="small"),
+            "Priority": st.column_config.TextColumn(width="small"),
+            "Type": st.column_config.TextColumn(width="small"),
+            "Renders as": st.column_config.TextColumn(width="small"),
+            "Evidence": st.column_config.TextColumn(width="small"),
+            "Section": st.column_config.TextColumn(width="small"),
+            "Requirement": st.column_config.TextColumn(width="large"),
+            "Found by": st.column_config.TextColumn(width="small"),
+        },
     )
     st.caption(
         f"{len(result.requirements)} requirements · "
@@ -306,20 +356,43 @@ def _draft(result) -> None:
 
 
 def _highlight(section) -> str:
-    """Wrap each recorded sentence in its provenance colour."""
-    html = section.content_md
-    for record in sorted(section.sentences, key=lambda r: -len(r.sentence)):
-        fg, bg, _ = PROVENANCE_COLOURS[record.kind]
-        sources = f" [{', '.join(record.source_ids)}]" if record.source_ids else ""
-        if record.sentence and record.sentence in html:
-            html = html.replace(
+    """Colour each recorded sentence by provenance, leaving markdown structure intact.
+
+    Two things this must not do, both of which it did originally:
+
+    - Convert newlines to <br>. Markdown needs its line structure to know where a
+      heading ends, so "## Title" followed by a <br> swallowed the entire section body
+      into one giant heading.
+    - Wrap a table row in a span. A row that starts with anything other than a pipe
+      stops being a table row, so highlighting rendered tables as literal pipe text.
+      Table rows are left alone; their provenance is visible in the counts above.
+    """
+    lines_out: list[str] = []
+    by_sentence = sorted(section.sentences, key=lambda r: -len(r.sentence))
+
+    for line in section.content_md.splitlines():
+        stripped = line.strip()
+        # Structure passes through untouched: headings, table rows, block quotes, rules.
+        if (not stripped or stripped.startswith(("#", "|", ">", "---", "```"))):
+            lines_out.append(line)
+            continue
+
+        rendered = line
+        for record in by_sentence:
+            if not record.sentence or record.sentence not in rendered:
+                continue
+            fg, bg, _ = PROVENANCE_COLOURS[record.kind]
+            sources = f" · {', '.join(record.source_ids)}" if record.source_ids else ""
+            rendered = rendered.replace(
                 record.sentence,
-                f"<span style='background:{bg};color:{fg};padding:1px 3px;"
+                f"<span style='background:{bg};color:{fg};padding:1px 4px;"
                 f"border-radius:3px' title='{record.kind.value}{sources}'>"
                 f"{record.sentence}</span>",
                 1,
             )
-    return html.replace("\n", "<br>")
+        lines_out.append(rendered)
+
+    return "\n".join(lines_out)
 
 
 def _compliance(result) -> None:
@@ -337,6 +410,14 @@ def _compliance(result) -> None:
           "Anchor": row.anchor or "—",
           "Text": row.requirement_text} for row in matrix.rows],
         use_container_width=True, hide_index=True, height=520,
+        column_config={
+            "RAG": st.column_config.TextColumn(width="small"),
+            "Requirement": st.column_config.TextColumn(width="small"),
+            "Priority": st.column_config.TextColumn(width="small"),
+            "Section": st.column_config.TextColumn(width="small"),
+            "Anchor": st.column_config.TextColumn(width="small"),
+            "Text": st.column_config.TextColumn(width="large"),
+        },
     )
 
 
@@ -366,6 +447,14 @@ def _assurance(result) -> None:
           "Evidence": f.evidence[:160]}
          for f in sorted(result.findings, key=lambda f: order[f.severity])],
         use_container_width=True, hide_index=True, height=460,
+        column_config={
+            "": st.column_config.TextColumn(width="small"),
+            "Severity": st.column_config.TextColumn(width="small"),
+            "Type": st.column_config.TextColumn(width="small"),
+            "Section": st.column_config.TextColumn(width="small"),
+            "Detail": st.column_config.TextColumn(width="large"),
+            "Evidence": st.column_config.TextColumn(width="medium"),
+        },
     )
 
 
@@ -398,11 +487,18 @@ def _export(result) -> None:
 
     st.divider()
     st.subheader("Where the text came from")
-    breakdown = result.package.report.provenance_breakdown
+    st.caption(
+        "All six provenance kinds are listed, including those this run did not produce, "
+        "so the breakdown matches the legend."
+    )
+    breakdown = dict(result.package.report.provenance_breakdown)
+    for kind in ProvenanceKind:  # ensure every legend entry has a row, even at zero
+        breakdown.setdefault(kind.value, 0)
     total = sum(breakdown.values()) or 1
     for kind, count in sorted(breakdown.items(), key=lambda t: -t[1]):
-        st.markdown(f"**{kind}** — {count} sentences ({100 * count / total:.0f}%)")
-        st.progress(count / total)
+        share = count / total
+        st.markdown(f"**{kind}** — {count} sentences ({100 * share:.0f}%)")
+        st.progress(share)
 
     if result.provider_usage:
         st.divider()

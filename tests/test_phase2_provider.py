@@ -40,7 +40,7 @@ class FakeBackend(P._Backend):
         self.script = list(script)
         self.calls = 0
 
-    def complete(self, prompt, system, model, json_mode):
+    def complete(self, prompt, system, model, json_mode, max_tokens=None):
         self.calls += 1
         item = self.script.pop(0) if self.script else "default"
         if isinstance(item, Exception):
@@ -202,6 +202,65 @@ def test_third_provider_used_when_first_two_fail(monkeypatch) -> None:
     assert (r.provider, r.text) == ("huggingface", "last resort")
 
 
+def test_strong_tier_downgrades_before_switching_provider(monkeypatch) -> None:
+    """Free tiers meter the large models hardest.
+
+    Groq exhausts its daily token budget on llama-3.3-70b long before the 8b model, so a
+    rate-limited strong call retries on the same provider's cheap model before moving
+    on. Switching provider first would waste a working budget.
+    """
+    monkeypatch.setattr(P.time, "sleep", lambda s: None)
+    models: list[str] = []
+
+    class Watcher(FakeBackend):
+        def complete(self, prompt, system, model, json_mode, max_tokens=None):
+            models.append(model)
+            if model == self.cfg.model_strong:
+                raise Exception("429 rate limit reached on tokens per day (TPD)")
+            return "served by the cheap model", 5, 5
+
+    settings = Settings(llm_provider_chain="groq,gemini", groq_api_key="k",
+                        gemini_api_key="k", llm_cache_enabled=False)
+    monkeypatch.setattr(
+        P, "_BACKENDS",
+        {n: (lambda cfg, t: Watcher(cfg, t, [])) for n in ("groq", "gemini")},
+    )
+    resp = P.LLMProvider(settings).generate("x", tier="strong")
+
+    assert resp.provider == "groq", "it switched provider instead of downgrading tier"
+    assert models[0] == settings.groq_model_strong
+    assert models[-1] == settings.groq_model_cheap
+    assert "downgraded" in resp.attempts[-1]
+
+
+def test_cheap_tier_is_not_downgraded(monkeypatch) -> None:
+    """There is nothing below cheap; retrying the same model would just burn quota."""
+    monkeypatch.setattr(P.time, "sleep", lambda s: None)
+    prov, made = build(
+        monkeypatch,
+        {"groq": [Exception("429 rate limit")] * 2, "gemini": ["ok"]},
+        "groq,gemini",
+    )
+    assert prov.generate("x", tier="cheap").provider == "gemini"
+    assert made["groq"].calls == 2
+
+
+def test_max_tokens_reaches_the_backend(monkeypatch) -> None:
+    """An uncapped section came back at 22,953 characters against a 400-word target."""
+    seen: list[int | None] = []
+
+    class Capped(FakeBackend):
+        def complete(self, prompt, system, model, json_mode, max_tokens=None):
+            seen.append(max_tokens)
+            return "ok", 1, 1
+
+    settings = Settings(llm_provider_chain="groq", groq_api_key="k",
+                        llm_cache_enabled=False)
+    monkeypatch.setattr(P, "_BACKENDS", {"groq": lambda cfg, t: Capped(cfg, t, [])})
+    P.LLMProvider(settings).generate("x", max_tokens=900)
+    assert seen == [900]
+
+
 def test_all_providers_failing_reports_every_reason(monkeypatch) -> None:
     monkeypatch.setattr(P.time, "sleep", lambda s: None)
     prov, _ = build(
@@ -259,9 +318,9 @@ def test_reparse_prompt_carries_the_validation_error(monkeypatch) -> None:
     seen: list[str] = []
 
     class Recorder(FakeBackend):
-        def complete(self, prompt, system, model, json_mode):
+        def complete(self, prompt, system, model, json_mode, max_tokens=None):
             seen.append(prompt)
-            return super().complete(prompt, system, model, json_mode)
+            return super().complete(prompt, system, model, json_mode, max_tokens)
 
     settings = Settings(llm_provider_chain="groq", groq_api_key="k", llm_cache_enabled=False)
     monkeypatch.setattr(
@@ -284,9 +343,9 @@ def test_json_mode_flag_reaches_the_backend(monkeypatch) -> None:
     flags: list[bool] = []
 
     class Flagged(FakeBackend):
-        def complete(self, prompt, system, model, json_mode):
+        def complete(self, prompt, system, model, json_mode, max_tokens=None):
             flags.append(json_mode)
-            return super().complete(prompt, system, model, json_mode)
+            return super().complete(prompt, system, model, json_mode, max_tokens)
 
     settings = Settings(llm_provider_chain="groq", groq_api_key="k", llm_cache_enabled=False)
     monkeypatch.setattr(
@@ -307,9 +366,9 @@ def test_tier_selects_the_right_model(monkeypatch) -> None:
     models: list[str] = []
 
     class Watcher(FakeBackend):
-        def complete(self, prompt, system, model, json_mode):
+        def complete(self, prompt, system, model, json_mode, max_tokens=None):
             models.append(model)
-            return super().complete(prompt, system, model, json_mode)
+            return super().complete(prompt, system, model, json_mode, max_tokens)
 
     settings = Settings(llm_provider_chain="groq", groq_api_key="k", llm_cache_enabled=False)
     monkeypatch.setattr(P, "_BACKENDS", {"groq": lambda cfg, t: Watcher(cfg, t, ["a", "b"])})
@@ -370,7 +429,7 @@ def test_generate_many_preserves_order(monkeypatch) -> None:
                         llm_max_concurrency=4)
 
     class Echo(FakeBackend):
-        def complete(self, prompt, system, model, json_mode):
+        def complete(self, prompt, system, model, json_mode, max_tokens=None):
             time.sleep(0.02 if prompt == "a" else 0.0)  # finish out of order
             return f"reply-{prompt}", 1, 1
 

@@ -165,14 +165,15 @@ class _Backend:
         self.bucket = TokenBucket(cfg.rpm)
 
     def complete(self, prompt: str, system: str | None, model: str,
-                 json_mode: bool) -> tuple[str, int, int]:
+                 json_mode: bool, max_tokens: int | None = None
+                 ) -> tuple[str, int, int]:
         raise NotImplementedError
 
 
 class GroqBackend(_Backend):
     name = "groq"
 
-    def complete(self, prompt, system, model, json_mode):
+    def complete(self, prompt, system, model, json_mode, max_tokens=None):
         from groq import Groq
 
         client = Groq(api_key=self.cfg.api_key, timeout=float(self.timeout))
@@ -180,6 +181,8 @@ class GroqBackend(_Backend):
             {"role": "user", "content": prompt}
         ]
         kwargs: dict[str, Any] = {"model": model, "messages": messages}
+        if max_tokens:
+            kwargs["max_tokens"] = max_tokens
         if json_mode:
             kwargs["response_format"] = {"type": "json_object"}
         r = client.chat.completions.create(**kwargs)
@@ -194,7 +197,7 @@ class GroqBackend(_Backend):
 class GeminiBackend(_Backend):
     name = "gemini"
 
-    def complete(self, prompt, system, model, json_mode):
+    def complete(self, prompt, system, model, json_mode, max_tokens=None):
         from google import genai
         from google.genai import types
 
@@ -202,6 +205,8 @@ class GeminiBackend(_Backend):
         cfg: dict[str, Any] = {}
         if system:
             cfg["system_instruction"] = system
+        if max_tokens:
+            cfg["max_output_tokens"] = max_tokens
         if json_mode:
             cfg["response_mime_type"] = "application/json"
         r = client.models.generate_content(
@@ -220,14 +225,15 @@ class GeminiBackend(_Backend):
 class HuggingFaceBackend(_Backend):
     name = "huggingface"
 
-    def complete(self, prompt, system, model, json_mode):
+    def complete(self, prompt, system, model, json_mode, max_tokens=None):
         from huggingface_hub import InferenceClient
 
         client = InferenceClient(api_key=self.cfg.api_key, timeout=float(self.timeout))
         messages = ([{"role": "system", "content": system}] if system else []) + [
             {"role": "user", "content": prompt}
         ]
-        kwargs: dict[str, Any] = {"model": model, "messages": messages, "max_tokens": 4096}
+        kwargs: dict[str, Any] = {"model": model, "messages": messages,
+                                  "max_tokens": max_tokens or 4096}
         if json_mode:
             kwargs["response_format"] = {"type": "json_object"}
         r = client.chat_completion(**kwargs)
@@ -244,12 +250,14 @@ class OllamaBackend(_Backend):
 
     name = "ollama"
 
-    def complete(self, prompt, system, model, json_mode):
+    def complete(self, prompt, system, model, json_mode, max_tokens=None):
         import httpx
 
         payload: dict[str, Any] = {"model": model, "prompt": prompt, "stream": False}
         if system:
             payload["system"] = system
+        if max_tokens:
+            payload["options"] = {"num_predict": max_tokens}
         if json_mode:
             payload["format"] = "json"
         r = httpx.post(
@@ -400,6 +408,7 @@ class LLMProvider:
         *,
         system: str | None = None,
         use_cache: bool | None = None,
+        max_tokens: int | None = None,
     ) -> LLMResponse:
         """Generate once, failing over across the provider chain.
 
@@ -427,7 +436,7 @@ class LLMProvider:
         last_error: Exception | None = None
 
         for round_index in range(self.settings.llm_max_json_retries + 1):
-            resp = self._call_chain(attempt_prompt, system, tier, json_mode)
+            resp = self._call_chain(attempt_prompt, system, tier, json_mode, max_tokens)
             if schema is None:
                 if cache_on:
                     self._cache.put(ckey, resp)
@@ -477,35 +486,48 @@ class LLMProvider:
             )
 
     def _call_chain(self, prompt: str, system: str | None, tier: str,
-                    json_mode: bool) -> LLMResponse:
-        """Try each configured provider in order until one answers."""
+                    json_mode: bool, max_tokens: int | None = None) -> LLMResponse:
+        """Try each configured provider in order until one answers.
+
+        Within a provider, a rate-limited "strong" call is retried on that provider's
+        cheap model before moving on. Free tiers meter the large models far harder --
+        Groq exhausts the daily token budget on llama-3.3-70b long before the 8b model
+        -- so downgrading the tier keeps a run alive where switching provider would not.
+        """
         reasons: dict[str, str] = {}
         attempts: list[str] = []
 
         for cfg in self._chain:
             backend = self._backend(cfg)
-            model = cfg.model_for(tier)
-            for attempt in range(self.settings.llm_max_attempts_per_provider):
-                backend.bucket.acquire()
-                t0 = time.time()
-                try:
-                    text, ptok, ctok = backend.complete(prompt, system, model, json_mode)
-                except Exception as exc:  # noqa: BLE001 - normalized by _classify
-                    err = _classify(exc)
-                    reasons[cfg.name] = str(err)[:300]
-                    attempts.append(f"{cfg.name}:{type(err).__name__}")
-                    log.warning("%s failed (attempt %d): %s", cfg.name, attempt + 1,
-                                str(err)[:200])
-                    if isinstance(err, RateLimited) and attempt == 0:
-                        time.sleep(2.0)  # one short backoff before moving on
-                        continue
-                    break
-                attempts.append(cfg.name)
-                return LLMResponse(
-                    text=text, provider=cfg.name, model=model, tier=tier,
-                    prompt_tokens=ptok, completion_tokens=ctok,
-                    latency_s=time.time() - t0, attempts=attempts,
-                )
+            models = [cfg.model_for(tier)]
+            if tier == "strong" and cfg.model_cheap != cfg.model_strong:
+                models.append(cfg.model_cheap)
+
+            for model_index, model in enumerate(models):
+                for attempt in range(self.settings.llm_max_attempts_per_provider):
+                    backend.bucket.acquire()
+                    t0 = time.time()
+                    try:
+                        text, ptok, ctok = backend.complete(
+                            prompt, system, model, json_mode, max_tokens
+                        )
+                    except Exception as exc:  # noqa: BLE001 - normalized by _classify
+                        err = _classify(exc)
+                        reasons[cfg.name] = str(err)[:300]
+                        attempts.append(f"{cfg.name}:{type(err).__name__}")
+                        log.warning("%s/%s failed (attempt %d): %s", cfg.name, model,
+                                    attempt + 1, str(err)[:200])
+                        if isinstance(err, RateLimited) and attempt == 0:
+                            time.sleep(2.0)  # one short backoff before moving on
+                            continue
+                        break
+                    attempts.append(cfg.name if model_index == 0
+                                    else f"{cfg.name}:downgraded")
+                    return LLMResponse(
+                        text=text, provider=cfg.name, model=model, tier=tier,
+                        prompt_tokens=ptok, completion_tokens=ctok,
+                        latency_s=time.time() - t0, attempts=attempts,
+                    )
         raise AllProvidersFailed(reasons)
 
     def _record(self, resp: LLMResponse) -> None:

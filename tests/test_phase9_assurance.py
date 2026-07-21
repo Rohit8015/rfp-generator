@@ -113,6 +113,42 @@ def test_consistency_stays_quiet_on_other_defects() -> None:
         assert report.passed, f"A10 fired on {name}: {report.contradictions}"
 
 
+def test_facts_are_actually_extracted_from_a_draft() -> None:
+    """Regression: the checker reported 'no contradictions across 0 extracted facts'.
+
+    Only two tracked quantities were swept, so a normal draft yielded an empty fact
+    table and a reviewer had no way to tell a clean document from an unexamined one.
+    """
+    section = GeneratedSection(
+        section_id="S-09", title="Commercials", deliverable_form=DeliverableForm.COSTING,
+        content_md=(
+            "## Commercials\n\nThe programme runs 72 weeks across 7 phases at a peak of "
+            "45 FTE.\n\nTotal investment is ₹1,757,250,000 with contingency at 10%.\n"
+        ),
+    )
+    report = ConsistencyChecker().check([section])
+    # The section states five figures: 72 weeks, 7 phases, 45 FTE, the total, and 10%.
+    assert report.facts_extracted >= 4, (
+        f"only {report.facts_extracted} facts extracted from a figure-heavy section; "
+        "the fact table is not reflecting the document"
+    )
+
+
+def test_many_different_currency_values_are_not_a_contradiction() -> None:
+    """A cost table naturally holds many different amounts. Flagging that would make
+    the checker fire on every proposal ever written.
+    """
+    section = GeneratedSection(
+        section_id="S-09", title="Costs", deliverable_form=DeliverableForm.COSTING,
+        content_md=("## Costs\n\n| Component | Amount |\n|---|---|\n"
+                    "| Services | ₹10.00 |\n| Cloud | ₹5.00 |\n"
+                    "| **TOTAL** | **₹15.00** |\n"),
+    )
+    report = ConsistencyChecker().check([section])
+    assert report.facts_extracted > 0
+    assert report.passed, f"false contradictions: {report.contradictions}"
+
+
 def test_a_reconciling_document_passes() -> None:
     good = GeneratedSection(
         section_id="S-01", title="Costs", deliverable_form=DeliverableForm.COSTING,

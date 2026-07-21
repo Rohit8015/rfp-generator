@@ -32,7 +32,15 @@ from src.utils import provenance
 
 log = logging.getLogger(__name__)
 
-MAX_CONTEXT_CHARS = 6000
+#: Retrieved context budget. Deliberately well inside the smallest context window in the
+#: chain (llama-3.1-8b-instant), because a prompt that overflows is rejected by every
+#: provider in turn and surfaces as AllProvidersFailed, which reads like an outage rather
+#: than the size problem it is.
+MAX_CONTEXT_CHARS = 4500
+MAX_CANDIDATE_CHARS = 1100
+#: If the full prompt still overflows, retry once on a much smaller context rather than
+#: escalating a section a model could have written.
+RETRY_CONTEXT_CHARS = 1500
 
 
 class NarrativeWriter:
@@ -52,9 +60,24 @@ class NarrativeWriter:
         failure_reason: str | None = None,
     ) -> GeneratedSection:
         """Draft the section. `failure_reason` feeds the Phase 10 regeneration loop."""
-        prompt = self._prompt(section, buyer, pack, themes or [], failure_reason)
         provider = self._get_provider()
-        resp = provider.generate(prompt, tier="strong")
+        prompt = self._prompt(section, buyer, pack, themes or [], failure_reason)
+        # Cap the output. Left uncapped, a section with a 400-word target came back at
+        # 22,953 characters, which is unreadable, unreviewable, and burns a free tier's
+        # daily token budget in a handful of sections.
+        budget = self._token_budget(section.target_words)
+        try:
+            resp = provider.generate(prompt, tier="strong", max_tokens=budget)
+        except Exception as exc:  # noqa: BLE001 - one retry on a smaller context
+            # Every provider refusing the same prompt is almost always an oversized
+            # prompt rather than an outage: a section covering twenty requirements
+            # carries a lot of retrieved text. Try once more with far less context
+            # before giving the section to a human.
+            log.warning("generation failed for %s (%s); retrying on a smaller context",
+                        section.id, type(exc).__name__)
+            prompt = self._prompt(section, buyer, pack, themes or [], failure_reason,
+                                  context_budget=RETRY_CONTEXT_CHARS)
+            resp = provider.generate(prompt, tier="strong", max_tokens=budget)
 
         content = self._clean(resp.text, section.title)
         kind = provenance.DECISION_TO_KIND.get(
@@ -76,6 +99,16 @@ class NarrativeWriter:
     # --- internals ------------------------------------------------------------------
 
     @staticmethod
+    def _token_budget(target_words: int) -> int:
+        """Output cap for a section, from its target length.
+
+        Roughly 1.4 tokens per word, doubled to leave room for markdown and for a
+        section that legitimately runs long, then clamped so no single section can
+        consume a disproportionate share of a free tier's daily budget.
+        """
+        return max(400, min(2200, int(target_words * 1.4 * 2)))
+
+    @staticmethod
     def _sources_for(kind: ProvenanceKind, pack: ContextPack) -> list[str]:
         """REUSED and ADAPTED cite exactly one source; SYNTHESIZED cites several."""
         ids = [c.chunk_id for c in pack.candidates]
@@ -92,8 +125,9 @@ class NarrativeWriter:
         pack: ContextPack,
         themes: list[WinTheme],
         failure_reason: str | None,
+        context_budget: int = MAX_CONTEXT_CHARS,
     ) -> str:
-        context = self._format_context(pack)
+        context = self._format_context(pack, context_budget)
         theme_block = "\n".join(f"- {t.statement}" for t in themes) or "- none assigned"
         pains = "\n".join(f"- {p}" for p in buyer.stated_pains[:5]) or "- not stated"
         criteria = "\n".join(
@@ -136,15 +170,15 @@ class NarrativeWriter:
         return prompt
 
     @staticmethod
-    def _format_context(pack: ContextPack) -> str:
+    def _format_context(pack: ContextPack, budget: int = MAX_CONTEXT_CHARS) -> str:
         out: list[str] = []
-        budget = MAX_CONTEXT_CHARS
+        remaining = budget
         for candidate in pack.candidates:
-            snippet = candidate.text[: max(0, min(1500, budget))]
+            snippet = candidate.text[: max(0, min(MAX_CANDIDATE_CHARS, remaining))]
             if not snippet:
                 break
             out.append(f"[{candidate.chunk_id}] ({candidate.source_ref})\n{snippet}")
-            budget -= len(snippet)
+            remaining -= len(snippet)
         return "\n\n".join(out) or "(no source material retrieved)"
 
     @staticmethod

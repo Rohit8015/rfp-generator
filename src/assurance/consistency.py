@@ -47,6 +47,21 @@ _TRACKED: dict[str, re.Pattern[str]] = {
     ),
 }
 
+#: Every measurable figure in the document, swept into the fact table so the reported
+#: count reflects what was actually examined. These do not drive contradiction checks on
+#: their own -- the tracked quantities and the table arithmetic do that -- but a check
+#: that reports "0 facts extracted" gives a reviewer no way to tell a clean document
+#: from an unexamined one.
+_MEASURABLE: dict[str, re.Pattern[str]] = {
+    "currency": re.compile(r"(?:[₹€$£]|INR|EUR|USD|GBP)\s*(" + _NUMBER + r")", re.I),
+    "percentage": re.compile(r"(" + _NUMBER + r")\s*%"),
+    "weeks": re.compile(r"\b(" + _NUMBER + r")\s*weeks?\b", re.I),
+    "months": re.compile(r"\b(" + _NUMBER + r")\s*months?\b", re.I),
+    "FTE": re.compile(r"\b(" + _NUMBER + r")\s*FTEs?\b", re.I),
+    "person-days": re.compile(r"\b(" + _NUMBER + r")\s*person[- ]days?\b", re.I),
+    "year": re.compile(r"\b(20\d{2})\b"),
+}
+
 
 @dataclass
 class Fact:
@@ -102,8 +117,15 @@ class ConsistencyChecker:
     # --- fact extraction ------------------------------------------------------------
 
     def _facts(self, section: GeneratedSection) -> list[Fact]:
+        """Every figure in the section, plus the specifically tracked quantities.
+
+        The tracked patterns drive the contradiction checks. The general sweep exists so
+        the fact table reflects the document: reporting "no contradictions across 0
+        facts" tells a reviewer nothing about whether anything was actually examined.
+        """
         facts: list[Fact] = []
         text = section.content_md
+
         for kind, pattern in _TRACKED.items():
             for match in pattern.finditer(text):
                 raw = next((g for g in match.groups() if g), None)
@@ -113,6 +135,23 @@ class ConsistencyChecker:
                     kind=kind,
                     value=self._number(raw),
                     unit="FTE" if "FTE" in kind else "months",
+                    section_id=section.section_id,
+                    evidence=self._context(text, match.start()),
+                ))
+
+        for unit, pattern in _MEASURABLE.items():
+            for match in pattern.finditer(text):
+                raw = next((g for g in match.groups() if g), None)
+                if raw is None:
+                    continue
+                try:
+                    value = self._number(raw)
+                except ValueError:
+                    continue
+                facts.append(Fact(
+                    kind=unit,
+                    value=value,
+                    unit=unit,
                     section_id=section.section_id,
                     evidence=self._context(text, match.start()),
                 ))
@@ -285,9 +324,17 @@ class ConsistencyChecker:
 
     @staticmethod
     def _conflicting_values(facts: list[Fact]) -> list[Contradiction]:
-        """The same tracked quantity must not carry two different values."""
+        """The same tracked quantity must not carry two different values.
+
+        Only the TRACKED quantities are checked. The general figure sweep is there to
+        populate the fact table, and a document naturally contains many different
+        currency amounts and percentages; treating those as conflicts would flag every
+        cost table ever written.
+        """
         grouped: dict[str, list[Fact]] = {}
         for fact in facts:
+            if fact.kind not in _TRACKED:
+                continue
             grouped.setdefault(fact.kind, []).append(fact)
 
         out: list[Contradiction] = []

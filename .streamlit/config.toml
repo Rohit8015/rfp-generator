@@ -1,0 +1,11 @@
+# Streamlit's analytics endpoint is unreachable in this environment and logs a recurring
+# "pageProfile TypeError: Failed to fetch" in the browser console. Nothing to do with the
+# app, but it is noise during a demo with the console open.
+[browser]
+gatherUsageStats = false
+
+[server]
+headless = true
+
+[theme]
+base = "light"
