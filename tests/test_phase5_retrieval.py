@@ -200,6 +200,38 @@ def test_confidence_is_a_margin_not_a_score(retriever) -> None:
 
 
 @pytest.mark.slow
+def test_concurrent_retrieval_does_not_race_on_the_index() -> None:
+    """Regression: sections retrieve in parallel and Chroma cannot take two clients
+    being constructed against the same path at once.
+
+    Unwarmed and unguarded, the first several threads raced and all but one failed with
+    "could not connect to tenant default_tenant", silently degrading those sections to a
+    stakeholder pack. Only the dashboard surfaced it, because thread timing differed
+    from the CLI.
+    """
+    from concurrent.futures import ThreadPoolExecutor
+
+    fresh = HybridRetriever()  # deliberately cold: no warm() call
+    queries = [
+        "data residency controls", "SOC 2 certification", "cloud cost optimisation",
+        "incident response process", "disaster recovery", "penetration testing",
+    ]
+    with ThreadPoolExecutor(max_workers=6) as pool:
+        packs = list(pool.map(lambda q: fresh.retrieve(q, top_k=3), queries))
+
+    assert len(packs) == len(queries)
+    for pack in packs:
+        assert pack.candidates, f"no candidates returned for {pack.query!r}"
+
+
+@pytest.mark.slow
+def test_warm_opens_every_index(retriever) -> None:
+    retriever.warm()
+    assert retriever._collection is not None
+    assert retriever._bm25 is not None
+
+
+@pytest.mark.slow
 def test_reranking_reorders_the_shortlist(retriever) -> None:
     query = "How do you handle data subject access requests?"
     plain = retriever.retrieve(query, top_k=5, rerank=False)

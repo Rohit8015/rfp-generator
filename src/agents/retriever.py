@@ -20,6 +20,7 @@ from __future__ import annotations
 
 import logging
 import re
+import threading
 
 from src.models.schemas import ContextPack, ReuseDecision, RetrievedCandidate
 
@@ -50,6 +51,11 @@ class HybridRetriever:
         self._bm25 = None
         self._chunks = None
         self._collection = None
+        #: Sections retrieve concurrently, and Chroma cannot take two clients being
+        #: constructed against the same path at once -- it fails with "could not connect
+        #: to tenant default_tenant". Lazy initialisation is therefore guarded, and
+        #: `warm()` exists so the orchestrator can do the work before the pool starts.
+        self._lock = threading.Lock()
 
     # --- public ---------------------------------------------------------------------
 
@@ -126,21 +132,37 @@ class HybridRetriever:
         return self._chunks
 
     def _load_lexical(self) -> None:
-        if self._bm25 is None:
-            from src.ingestion.ingest import load_bm25
+        if self._bm25 is not None:
+            return
+        with self._lock:
+            if self._bm25 is None:
+                from src.ingestion.ingest import load_bm25
 
-            self._bm25, self._chunks = load_bm25(self.settings)
+                self._bm25, self._chunks = load_bm25(self.settings)
 
     @property
     def collection(self):
-        if self._collection is None:
-            import chromadb
+        if self._collection is not None:
+            return self._collection
+        with self._lock:
+            if self._collection is None:
+                import chromadb
 
-            from src.ingestion.ingest import COLLECTION
+                from src.ingestion.ingest import COLLECTION
 
-            client = chromadb.PersistentClient(path=str(self.settings.chroma_path))
-            self._collection = client.get_collection(COLLECTION)
+                client = chromadb.PersistentClient(path=str(self.settings.chroma_path))
+                self._collection = client.get_collection(COLLECTION)
         return self._collection
+
+    def warm(self) -> None:
+        """Open every index up front, before any concurrency starts.
+
+        Called by the orchestrator before the generation pool. Without it, the first
+        several sections race to construct the Chroma client and all but one fail.
+        """
+        self._load_lexical()
+        _ = self.collection
+        self.provider.embed(["warm"])
 
     # --- retrieval stages -----------------------------------------------------------
 

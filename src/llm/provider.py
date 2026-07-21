@@ -360,6 +360,11 @@ class LLMProvider:
         self._embedder = None
         self._reranker = None
         self._lock = threading.Lock()
+        #: Guards construction of the local models. Separate from _inference_lock so a
+        #: long encode does not block another thread merely checking whether it loaded.
+        self._model_lock = threading.Lock()
+        #: Serialises calls into the local torch models, which share mutable state.
+        self._inference_lock = threading.Lock()
         #: Per-call telemetry, drained into the runs table by the orchestrator.
         self.call_log: list[dict[str, Any]] = []
 
@@ -526,31 +531,53 @@ class LLMProvider:
 
     # --- local models: never routed to a provider ----------------------------------
 
+    # Loading a sentence-transformers model is not thread safe, and neither is calling
+    # into one while another thread is still constructing it. Sections retrieve
+    # concurrently, so six threads racing to build the CrossEncoder crashed the
+    # interpreter outright rather than raising. Construction is locked, and inference is
+    # serialised behind the same lock because the underlying torch modules are shared.
+    def _load_model(self, attribute: str, factory) -> object:
+        existing = getattr(self, attribute)
+        if existing is not None:
+            return existing
+        with self._model_lock:
+            if getattr(self, attribute) is None:
+                setattr(self, attribute, factory())
+            return getattr(self, attribute)
+
     def embed(self, texts: list[str]) -> list[list[float]]:
         """Embed locally with bge-small. See CLAUDE.md for why this is not cloud."""
         if not texts:
             return []
-        if self._embedder is None:
+
+        def build():
             from sentence_transformers import SentenceTransformer
 
             log.info("loading local embedder %s", self.settings.embedding_model)
-            self._embedder = SentenceTransformer(self.settings.embedding_model)
-        return self._embedder.encode(
-            texts, normalize_embeddings=True, show_progress_bar=False
-        ).tolist()
+            return SentenceTransformer(self.settings.embedding_model)
+
+        model = self._load_model("_embedder", build)
+        with self._inference_lock:
+            return model.encode(
+                texts, normalize_embeddings=True, show_progress_bar=False
+            ).tolist()
 
     def rerank(self, query: str, docs: list[str]) -> list[tuple[int, float]]:
         """Cross-encoder rerank. Returns (original_index, score), best first."""
         if not docs:
             return []
-        if self._reranker is None:
+
+        def build():
             from sentence_transformers import CrossEncoder
 
             log.info("loading local reranker %s", self.settings.reranker_model)
-            self._reranker = CrossEncoder(self.settings.reranker_model)
-        scores = self._reranker.predict([(query, d) for d in docs])
-        ranked = sorted(enumerate(float(s) for s in scores), key=lambda t: t[1], reverse=True)
-        return ranked
+            return CrossEncoder(self.settings.reranker_model)
+
+        model = self._load_model("_reranker", build)
+        with self._inference_lock:
+            scores = model.predict([(query, d) for d in docs])
+        return sorted(enumerate(float(s) for s in scores), key=lambda t: t[1],
+                      reverse=True)
 
 
 _provider: LLMProvider | None = None

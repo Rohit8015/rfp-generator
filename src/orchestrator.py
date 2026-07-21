@@ -193,6 +193,12 @@ class Orchestrator:
         sections = result.outline.sections
         workers = min(self.settings.llm_max_concurrency, max(1, len(sections)))
 
+        # Open the indices before any concurrency starts. Left lazy, the first several
+        # sections race to construct the Chroma client and all but one fail with
+        # "could not connect to tenant default_tenant", silently degrading those
+        # sections to a stakeholder pack.
+        self._warm_retriever()
+
         with ThreadPoolExecutor(max_workers=workers) as pool:
             return list(pool.map(
                 lambda s: self._generate_one(router, s, result), sections
@@ -220,6 +226,16 @@ class Orchestrator:
                 [r for r in result.requirements if r.id in set(section.requirement_ids)],
                 f"generation failed: {type(exc).__name__}",
             )
+
+    def _warm_retriever(self) -> None:
+        """Build the retriever and open its indices, single-threaded."""
+        try:
+            if self._retriever is None:
+                self._retriever = HybridRetriever(self.settings, self._provider)
+            self._retriever.warm()
+        except Exception as exc:  # noqa: BLE001 - degrade to stakeholder packs, loudly
+            log.warning("retrieval unavailable for this run: %s", exc)
+            self._retriever = None
 
     def _retrieve(self, section: OutlineSection, result: RunResult) -> ContextPack:
         """Retrieve for a section, degrading to a stakeholder pack if retrieval fails."""
