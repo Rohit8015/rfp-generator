@@ -46,6 +46,15 @@ RAG_ICON = {RAG.GREEN: "🟢", RAG.AMBER: "🟠", RAG.RED: "🔴"}
 FIT_ICON = {Fit.STRONG: "🟢 STRONG", Fit.PARTIAL: "🟠 PARTIAL", Fit.GAP: "🔴 GAP"}
 
 
+@st.cache_resource(show_spinner=False)
+def _bootstrap() -> bool:
+    """Build the search indices on first run. Cached, so it happens once per deploy."""
+    from src.bootstrap import ensure_indices
+
+    with st.spinner("Preparing the search index (first run only, ~1 minute)…"):
+        return ensure_indices()
+
+
 def main() -> None:
     st.set_page_config(page_title="RFP Copilot", page_icon="📄", layout="wide")
     st.title("RFP Copilot")
@@ -54,6 +63,7 @@ def main() -> None:
         "gaps surfaced rather than written around, and the arithmetic checked."
     )
 
+    _bootstrap()
     _sidebar()
     if st.session_state.get("result") is None:
         _landing()

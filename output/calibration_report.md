@@ -1,6 +1,6 @@
 # Retrieval threshold calibration
 
-- **Version:** `2026-07-21-bge-small-en-v1.5`
+- **Version:** `2026-07-22-bge-small-en-v1.5`
 - **Embedding model:** `BAAI/bge-small-en-v1.5` (local, 384-dim)
 - **Method:** unsupervised percentile calibration on corpus self-similarity; REUSE at p99.5, ADAPT at p97.0
 - **Background pairs:** 7,140

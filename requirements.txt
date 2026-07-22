@@ -14,6 +14,9 @@ google-genai>=0.3
 huggingface-hub>=0.24
 
 # --- Embeddings & reranking (local — deliberately not cloud, see CLAUDE.md) ---
+# The CPU wheel index keeps torch small (~200 MB vs ~2 GB for the CUDA build), which is
+# what lets this fit a free cloud tier. Additive to PyPI, so local installs are unaffected.
+--extra-index-url https://download.pytorch.org/whl/cpu
 sentence-transformers>=3.0
 torch>=2.2
 
