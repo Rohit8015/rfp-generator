@@ -1,3 +1,14 @@
+---
+title: RFP Copilot
+emoji: 📄
+colorFrom: blue
+colorTo: green
+sdk: streamlit
+app_file: app/dashboard.py
+pinned: false
+license: mit
+---
+
 # RFP Copilot v2
 
 A four-plane, thirteen-agent system that turns an RFP into a complete proposal package —
