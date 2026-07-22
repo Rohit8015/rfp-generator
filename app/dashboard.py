@@ -46,6 +46,27 @@ RAG_ICON = {RAG.GREEN: "🟢", RAG.AMBER: "🟠", RAG.RED: "🔴"}
 FIT_ICON = {Fit.STRONG: "🟢 STRONG", Fit.PARTIAL: "🟠 PARTIAL", Fit.GAP: "🔴 GAP"}
 
 
+def _load_secrets_into_env() -> None:
+    """Bridge Streamlit Cloud secrets into the environment.
+
+    Streamlit Community Cloud stores secrets in st.secrets, not as environment
+    variables, but config.py reads the environment (pydantic-settings). Copying them
+    across lets the identical settings work in three places without change: a local
+    .env file, real environment variables, and the Streamlit Cloud secrets manager.
+
+    Runs before any config import, so the settings singleton is built with the keys
+    already present. A missing secrets file locally is expected -- .env covers that.
+    """
+    import os
+
+    try:
+        for key, value in st.secrets.items():
+            if isinstance(value, (str, int, float)):
+                os.environ.setdefault(key, str(value))
+    except Exception:  # noqa: BLE001 - no secrets file is a normal local state
+        pass
+
+
 @st.cache_resource(show_spinner=False)
 def _bootstrap() -> bool:
     """Build the search indices on first run. Cached, so it happens once per deploy."""
@@ -56,6 +77,7 @@ def _bootstrap() -> bool:
 
 
 def main() -> None:
+    _load_secrets_into_env()  # must run before any config import
     st.set_page_config(page_title="RFP Copilot", page_icon="📄", layout="wide")
     st.title("RFP Copilot")
     st.caption(
