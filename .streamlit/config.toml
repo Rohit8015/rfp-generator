@@ -7,5 +7,10 @@ gatherUsageStats = false
 [server]
 headless = true
 
+[client]
+# Hide the developer menu items (including "View app source" and the GitHub link) from
+# viewers of the deployed app. "minimal" shows only essential controls.
+toolbarMode = "minimal"
+
 [theme]
 base = "light"
