@@ -113,23 +113,20 @@ def _sidebar() -> None:
         if picked == choices[0]:
             uploaded = st.file_uploader("Upload an RFP", type=["md", "txt", "pdf", "docx"])
 
-        live = st.toggle("Use models", value=True,
-                         help="Off runs the deterministic path only: no model calls.")
-
-        if live:
-            providers = [p.name for p in settings.available_providers()]
-            st.caption(
-                f"Provider chain: {' → '.join(providers) if providers else 'none configured'}"
-            )
-        else:
-            st.caption("Deterministic path — no provider is used.")
+        # The pipeline always runs with the language models on. The deterministic-only
+        # path still exists in code (Orchestrator(use_llm=False)) for tests and offline
+        # use, but it is not offered in the UI.
+        providers = [p.name for p in settings.available_providers()]
+        st.caption(
+            f"Provider chain: {' → '.join(providers) if providers else 'none configured'}"
+        )
 
         if st.button("Run pipeline", type="primary", use_container_width=True):
             path = _resolve_input(settings, picked, uploaded, choices[0])
             if path is None:
                 st.error("Choose an RFP or upload one.")
             else:
-                _run(path, live)
+                _run(path, live=True)
 
         if st.session_state.get("result") is not None:
             st.divider()
