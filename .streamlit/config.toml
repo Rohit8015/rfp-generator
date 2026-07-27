@@ -14,3 +14,6 @@ toolbarMode = "minimal"
 
 [theme]
 base = "light"
+# Accent colour for buttons, sliders, the progress bar and highlights. Streamlit's
+# default is a red/coral (#FF4B4B); this sets the theme to purple. Cosmetic only.
+primaryColor = "#7C3AED"
