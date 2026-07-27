@@ -84,7 +84,8 @@ class Assembler:
         report_path.write_text(self.render_report(report, findings, ordered),
                                encoding="utf-8")
 
-        docx_path = self._write_docx(run_id, title, ordered, matrix)
+        docx_path = self._write_docx(run_id, title, ordered, matrix, tasks_markdown,
+                                     findings)
 
         return Package(
             markdown_path=markdown_path,
@@ -229,7 +230,8 @@ class Assembler:
     # --- docx -----------------------------------------------------------------------
 
     def _write_docx(self, run_id: str, title: str, sections: list[GeneratedSection],
-                    matrix: ComplianceMatrix) -> Path | None:
+                    matrix: ComplianceMatrix, tasks_markdown: str = "",
+                    findings: list[AssuranceFinding] | None = None) -> Path | None:
         try:
             import docx
         except ImportError:  # pragma: no cover - python-docx is a hard dependency
@@ -259,9 +261,43 @@ class Assembler:
         document.add_heading("Requirements compliance matrix", level=1)
         self._add_matrix_table(document, matrix)
 
+        # Human tasks and blocking findings, so the Word file carries the same
+        # human-facing hand-off as the Markdown export rather than stopping at the matrix.
+        self._add_tasks(document, tasks_markdown)
+        self._add_blockers(document, findings or [])
+
         path = self.output_dir / f"{run_id}_response.docx"
         document.save(str(path))
         return path
+
+    def _add_tasks(self, document, tasks_markdown: str) -> None:
+        """Render the Human tasks section. Reuses the Markdown the tracker produced."""
+        if not tasks_markdown.strip():
+            return
+        document.add_heading("Human tasks", level=1)
+        for block in tasks_markdown.split("\n\n"):
+            block = block.strip()
+            if not block or block.startswith("#"):
+                continue
+            if block.startswith("|"):
+                self._add_table(document, block)
+            else:
+                document.add_paragraph(block)
+
+    @staticmethod
+    def _add_blockers(document, findings: list[AssuranceFinding]) -> None:
+        """List the findings that must be resolved before submission."""
+        blockers = [f for f in findings if f.severity is Severity.BLOCKER]
+        if not blockers:
+            return
+        document.add_heading("Blocking assurance findings", level=1)
+        document.add_paragraph("These must be resolved before submission.")
+        for finding in blockers:
+            document.add_paragraph(
+                f"{finding.finding_type.value} "
+                f"({finding.section_id or 'document'}): {finding.detail}",
+                style="List Bullet",
+            )
 
     @staticmethod
     def _add_table(document, block: str) -> None:

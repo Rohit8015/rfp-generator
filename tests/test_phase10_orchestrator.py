@@ -180,6 +180,21 @@ def test_one_command_produces_the_full_package(tmp_path) -> None:
     assert "Requirements compliance matrix" in document
     assert "Human tasks" in document
 
+    # The Word export must carry the same human-facing hand-off as the Markdown, not
+    # stop at the compliance matrix.
+    import docx
+
+    docx_text = "\n".join(p.text for p in docx.Document(str(package.docx_path)).paragraphs)
+    docx_tables = " ".join(
+        cell.text
+        for table in docx.Document(str(package.docx_path)).tables
+        for row in table.rows for cell in row.cells
+    )
+    assert "Requirements compliance matrix" in docx_text
+    if result.tasks:
+        assert "Human tasks" in docx_text, "docx dropped the Human tasks section"
+        assert result.tasks[0].id in docx_tables, "docx tasks table has no task rows"
+
     report = package.report_path.read_text(encoding="utf-8")
     assert "Automation rate" in report
     assert "Where the text came from" in report
