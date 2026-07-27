@@ -538,17 +538,54 @@ class LLMProvider:
         })
 
     def usage_summary(self) -> dict[str, Any]:
-        """Provider mix and token totals for the runs table and the automation report."""
-        mix: dict[str, int] = {}
-        for c in self.call_log:
-            mix[c["provider"]] = mix.get(c["provider"], 0) + 1
+        """Provider, model and tier usage for the runs table, report and dashboard.
+
+        Keeps the original aggregate keys (calls, cached, provider_mix, prompt_tokens,
+        completion_tokens, total_latency_s) and adds per-model, per-tier and per-provider
+        breakdowns so token usage can be shown in detail.
+        """
+        log = self.call_log
+        calls = len(log)
+        prompt = sum(c["prompt_tokens"] for c in log)
+        completion = sum(c["completion_tokens"] for c in log)
+        cached = sum(1 for c in log if c["cached"])
+        latency = sum(c["latency_s"] for c in log)
+
+        def group_by(field: str) -> dict[str, dict[str, Any]]:
+            out: dict[str, dict[str, Any]] = {}
+            for c in log:
+                bucket = out.setdefault(c[field], {
+                    "calls": 0, "cached": 0, "prompt_tokens": 0,
+                    "completion_tokens": 0, "latency_s": 0.0,
+                })
+                bucket["calls"] += 1
+                bucket["cached"] += 1 if c["cached"] else 0
+                bucket["prompt_tokens"] += c["prompt_tokens"]
+                bucket["completion_tokens"] += c["completion_tokens"]
+                bucket["latency_s"] += c["latency_s"]
+            for bucket in out.values():
+                bucket["total_tokens"] = bucket["prompt_tokens"] + bucket["completion_tokens"]
+                bucket["avg_latency_s"] = round(
+                    bucket["latency_s"] / bucket["calls"], 3) if bucket["calls"] else 0.0
+                bucket["latency_s"] = round(bucket["latency_s"], 2)
+            return out
+
+        by_provider = group_by("provider")
         return {
-            "calls": len(self.call_log),
-            "cached": sum(1 for c in self.call_log if c["cached"]),
-            "provider_mix": mix,
-            "prompt_tokens": sum(c["prompt_tokens"] for c in self.call_log),
-            "completion_tokens": sum(c["completion_tokens"] for c in self.call_log),
-            "total_latency_s": round(sum(c["latency_s"] for c in self.call_log), 2),
+            "calls": calls,
+            "live_calls": calls - cached,
+            "cached": cached,
+            "cache_hit_rate": round(cached / calls, 3) if calls else 0.0,
+            "provider_mix": {p: b["calls"] for p, b in by_provider.items()},
+            "by_provider": by_provider,
+            "by_model": group_by("model"),
+            "by_tier": group_by("tier"),
+            "prompt_tokens": prompt,
+            "completion_tokens": completion,
+            "total_tokens": prompt + completion,
+            "avg_tokens_per_call": round((prompt + completion) / calls) if calls else 0,
+            "total_latency_s": round(latency, 2),
+            "avg_latency_s": round(latency / calls, 3) if calls else 0.0,
         }
 
     # --- local models: never routed to a provider ----------------------------------

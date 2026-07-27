@@ -453,6 +453,24 @@ def test_usage_summary_reports_provider_mix(monkeypatch) -> None:
     assert s["provider_mix"] == {"groq": 1, "gemini": 1}
     assert s["prompt_tokens"] == 22 and s["completion_tokens"] == 44
 
+    # Enriched breakdowns for the detailed usage view.
+    assert s["total_tokens"] == 66
+    assert s["live_calls"] == 2 and s["cached"] == 0
+    assert set(s["by_provider"]) == {"groq", "gemini"}
+    assert s["by_provider"]["groq"]["total_tokens"] == 33
+    assert s["by_tier"]["cheap"]["calls"] == 2
+    assert set(s["by_model"])  # a per-model breakdown exists
+    assert s["avg_tokens_per_call"] == 33
+
+
+def test_usage_summary_is_empty_without_calls(monkeypatch) -> None:
+    prov, _ = build(monkeypatch, {"groq": ["x"]}, "groq")
+    s = prov.usage_summary()
+    assert s["calls"] == 0
+    assert s["total_tokens"] == 0
+    assert s["by_model"] == {} and s["by_tier"] == {}
+    assert s["cache_hit_rate"] == 0.0
+
 
 # --------------------------------------------------------------------------------------
 # Live tests — real keys, real network
