@@ -534,11 +534,16 @@ def _export(result) -> None:
 
 
 def _model_usage(result) -> None:
-    """Detailed token and call usage for the run."""
+    """Detailed token and call usage for the run.
+
+    Reads every value defensively with .get(), so a run produced by an older code
+    version (whose usage dict lacks the enriched keys) renders rather than crashing.
+    """
     usage = result.provider_usage or {}
     st.subheader("Model usage this run")
 
-    if not usage.get("calls"):
+    calls = usage.get("calls", 0)
+    if not calls:
         st.info(
             "No live model calls — this was a deterministic run, or every call was served "
             "from cache. Token usage applies only to generative calls; the local "
@@ -546,62 +551,77 @@ def _model_usage(result) -> None:
         )
         return
 
+    cached = usage.get("cached", 0)
+    live = usage.get("live_calls", calls - cached)
+    prompt = usage.get("prompt_tokens", 0)
+    completion = usage.get("completion_tokens", 0)
+    total = usage.get("total_tokens", prompt + completion)
+    cache_rate = usage.get("cache_hit_rate", (cached / calls) if calls else 0.0)
+    avg_tokens = usage.get("avg_tokens_per_call", round(total / calls) if calls else 0)
+    total_latency = usage.get("total_latency_s", 0.0)
+    avg_latency = usage.get("avg_latency_s", 0.0)
+
     # Headline metrics
     a, b, c, d = st.columns(4)
-    a.metric("Model calls", usage["calls"],
-             help=f"{usage['live_calls']} live · {usage['cached']} from cache")
-    b.metric("Total tokens", f"{usage['total_tokens']:,}",
-             help=f"{usage['prompt_tokens']:,} prompt (in) · "
-                  f"{usage['completion_tokens']:,} completion (out) · "
-                  f"~{usage['avg_tokens_per_call']:,} per call")
-    c.metric("Cache hit rate", f"{usage['cache_hit_rate'] * 100:.0f}%",
+    a.metric("Model calls", calls, help=f"{live} live · {cached} from cache")
+    b.metric("Total tokens", f"{total:,}",
+             help=f"{prompt:,} prompt (in) · {completion:,} completion (out) · "
+                  f"~{avg_tokens:,} per call")
+    c.metric("Cache hit rate", f"{cache_rate * 100:.0f}%",
              help="Share of calls served from the content-hash cache — free and instant.")
-    d.metric("Total latency", f"{usage['total_latency_s']:.1f}s",
-             help=f"~{usage['avg_latency_s']:.2f}s per call (live calls only)")
+    d.metric("Total latency", f"{total_latency:.1f}s",
+             help=f"~{avg_latency:.2f}s per call (live calls only)")
 
     # Prompt vs completion split
-    prompt_share = usage["prompt_tokens"] / (usage["total_tokens"] or 1)
+    prompt_share = prompt / (total or 1)
     st.caption(
-        f"**Token split** — {usage['prompt_tokens']:,} in "
-        f"({prompt_share * 100:.0f}%) · {usage['completion_tokens']:,} out "
-        f"({(1 - prompt_share) * 100:.0f}%). Input dominates because each prompt carries "
-        "the buyer profile, win themes and retrieved context."
+        f"**Token split** — {prompt:,} in ({prompt_share * 100:.0f}%) · "
+        f"{completion:,} out ({(1 - prompt_share) * 100:.0f}%). Input dominates because "
+        "each prompt carries the buyer profile, win themes and retrieved context."
     )
 
-    st.markdown("**By model**")
-    st.dataframe(
-        [{"Model": model,
-          "Calls": v["calls"],
-          "Cached": v["cached"],
-          "Prompt tokens": f"{v['prompt_tokens']:,}",
-          "Completion tokens": f"{v['completion_tokens']:,}",
-          "Total tokens": f"{v['total_tokens']:,}",
-          "Avg latency (s)": v["avg_latency_s"]}
-         for model, v in sorted(usage["by_model"].items(),
-                                key=lambda kv: -kv[1]["total_tokens"])],
-        use_container_width=True, hide_index=True,
-    )
+    by_model = usage.get("by_model", {})
+    if by_model:
+        st.markdown("**By model**")
+        st.dataframe(
+            [{"Model": model,
+              "Calls": v.get("calls", 0),
+              "Cached": v.get("cached", 0),
+              "Prompt tokens": f"{v.get('prompt_tokens', 0):,}",
+              "Completion tokens": f"{v.get('completion_tokens', 0):,}",
+              "Total tokens": f"{v.get('total_tokens', 0):,}",
+              "Avg latency (s)": v.get("avg_latency_s", 0.0)}
+             for model, v in sorted(by_model.items(),
+                                    key=lambda kv: -kv[1].get("total_tokens", 0))],
+            use_container_width=True, hide_index=True,
+        )
 
-    left, right = st.columns(2)
-    with left:
-        st.markdown("**By tier**")
-        st.caption("cheap = light tasks · strong = drafting and assurance")
-        st.dataframe(
-            [{"Tier": tier, "Calls": v["calls"], "Total tokens": f"{v['total_tokens']:,}"}
-             for tier, v in sorted(usage["by_tier"].items())],
-            use_container_width=True, hide_index=True,
-        )
-    with right:
-        st.markdown("**By provider**")
-        st.caption("which free tier actually served each call, after failover")
-        st.dataframe(
-            [{"Provider": prov, "Calls": v["calls"],
-              "Total tokens": f"{v['total_tokens']:,}",
-              "Avg latency (s)": v["avg_latency_s"]}
-             for prov, v in sorted(usage["by_provider"].items(),
-                                   key=lambda kv: -kv[1]["calls"])],
-            use_container_width=True, hide_index=True,
-        )
+    by_tier = usage.get("by_tier", {})
+    by_provider = usage.get("by_provider", {})
+    if by_tier or by_provider:
+        left, right = st.columns(2)
+        with left:
+            if by_tier:
+                st.markdown("**By tier**")
+                st.caption("cheap = light tasks · strong = drafting and assurance")
+                st.dataframe(
+                    [{"Tier": tier, "Calls": v.get("calls", 0),
+                      "Total tokens": f"{v.get('total_tokens', 0):,}"}
+                     for tier, v in sorted(by_tier.items())],
+                    use_container_width=True, hide_index=True,
+                )
+        with right:
+            if by_provider:
+                st.markdown("**By provider**")
+                st.caption("which free tier actually served each call, after failover")
+                st.dataframe(
+                    [{"Provider": prov, "Calls": v.get("calls", 0),
+                      "Total tokens": f"{v.get('total_tokens', 0):,}",
+                      "Avg latency (s)": v.get("avg_latency_s", 0.0)}
+                     for prov, v in sorted(by_provider.items(),
+                                           key=lambda kv: -kv[1].get("calls", 0))],
+                    use_container_width=True, hide_index=True,
+                )
 
     with st.expander("Raw usage JSON"):
         st.json(usage)

@@ -111,6 +111,29 @@ def test_highlighter_handles_a_section_with_no_records() -> None:
     assert "Some text." in dashboard._highlight(empty)
 
 
+def test_model_usage_survives_an_old_format_usage_dict() -> None:
+    """Regression: a run produced before the enriched usage_summary lacked keys like
+    live_calls and by_model, which crashed the Export tab with a KeyError after a
+    redeploy left the old result in the session.
+    """
+    import app.dashboard as dashboard
+
+    class _Result:
+        provider_usage = {
+            "calls": 5, "cached": 1, "provider_mix": {"groq": 5},
+            "prompt_tokens": 100, "completion_tokens": 40, "total_latency_s": 3.2,
+        }
+
+    # Every value is read with .get and a fallback, so the missing enriched keys
+    # (live_calls, total_tokens, by_model, …) must not raise a KeyError.
+    try:
+        dashboard._model_usage(_Result())
+    except KeyError as exc:  # the exact failure we are guarding against
+        raise AssertionError(f"old-format usage dict crashed the display: {exc}") from exc
+    except Exception:  # noqa: BLE001 - Streamlit context errors outside a run are fine
+        pass
+
+
 def test_dashboard_never_sends_anything() -> None:
     """CLAUDE.md: drafts only. The UI exports files; it must not transmit."""
     source = (ROOT / "app" / "dashboard.py").read_text(encoding="utf-8").lower()
